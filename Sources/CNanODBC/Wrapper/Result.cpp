@@ -110,23 +110,32 @@ CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error) 
 		return cTimeStamp;
 	} catch (nanodbc::null_access_error& e) {
 		printf("\n%s\n", strdup(e.what()));
-		error = (CError *)malloc(sizeof(CError));
 		*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
+
+		//error = (CError *)malloc(sizeof(CError));
+		//*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
 		return NULL;
 	} catch (nanodbc::type_incompatible_error& e) {
 		printf("\n%s\n", strdup(e.what()));
+		CError * errorPointer = new CError;
+		errorPointer->message = strdup(e.what());
+		errorPointer->reason = invalidType;
 		error = (CError *)malloc(sizeof(CError));
-		*error = CError { .message = strdup(e.what()), .reason = invalidType };
+		memcpy(error, errorPointer, sizeof(CError));
 		return NULL;
 	} catch (nanodbc::index_range_error& e) {
 		printf("\n%s\n", strdup(e.what()));
-		error = (CError *)malloc(sizeof(CError));
-		*error = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+		CError * errorPointer = new CError;
+		errorPointer->message = strdup(e.what());
+		errorPointer->reason = indexOutOfRange;
+		memcpy(error, errorPointer, sizeof(CError));
 		return NULL;
 	} catch (nanodbc::programming_error& e) {
 		printf("\n%s\n", strdup(e.what()));
-		error = (CError *)malloc(sizeof(CError));
-		*error = CError { .message = strdup(e.what()), .reason = programmingError };
+		CError * errorPointer = new CError;
+		errorPointer->message = strdup(e.what());
+		errorPointer->reason = programmingError;
+		error = errorPointer;
 		return NULL;
 	} catch (std::exception& e) {
 		assert(error == NULL);

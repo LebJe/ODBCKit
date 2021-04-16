@@ -12,8 +12,7 @@ CConnection * createConnectionConnectionString(const char * connStr, long timeou
 		try {
 			return reinterpret_cast<CConnection *>( new nanodbc::connection(charToString(connStr), timeout) );
 		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what()) };
-			*error = cError;
+			*error = CError { .message = strdup(e.what()), .reason = programmingError };
 			return NULL;
 		}
 	}
@@ -22,8 +21,7 @@ CConnection * createConnectionDSN(const char * dsn, const char * username, const
 		try {
 			return reinterpret_cast<CConnection *>( new nanodbc::connection(charToString(dsn), charToString(username), charToString(password), timeout) );
 		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what()) };
-			*error = cError;
+			*error = CError { .message = strdup(e.what()), .reason = programmingError };
 			return NULL;
 		}
 	}

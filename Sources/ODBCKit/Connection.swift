@@ -19,21 +19,21 @@ public class Connection {
 		self.connectionType = connectionType
 		switch connectionType {
 			case let .odbcString(connStr):
-				let errorPointer: UnsafeMutablePointer<CError>? = nil
+				let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 
-				if let c = createConnectionConnectionString(connStr, timeout, errorPointer), errorPointer == nil {
+				if let c = createConnectionConnectionString(connStr, timeout, errorPointer), errorPointer.pointee.message == nil {
 					self.connection = c
 				} else {
-					throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
+					throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
 				}
 
 			case let .dataSource(dsn: dsn, username: username, password: password):
-				let errorPointer: UnsafeMutablePointer<CError>? = nil
+				let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 
-				if let c = createConnectionDSN(dsn, username, password, timeout, errorPointer), errorPointer == nil {
+				if let c = createConnectionDSN(dsn, username, password, timeout, errorPointer), errorPointer.pointee.message == nil {
 					self.connection = c
 				} else {
-					throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
+					throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
 				}
 		}
 	}
@@ -41,25 +41,25 @@ public class Connection {
 	// deinit { destroyConnection(connection) }
 
 	public func justExecute(query: String, timeout: Int = 0) throws {
-		let errorPointer: UnsafeMutablePointer<CError>? = nil
+		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 
 		CNanODBC.justExecute(self.connection, query, 1, timeout, errorPointer)
 
-		guard errorPointer == nil else {
-			throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
+		guard errorPointer.pointee.message == nil else {
+			throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
 		}
 	}
 
 	public func execute(query: String, timeout: Int = 0) throws -> Result {
-		let errorPointer: UnsafeMutablePointer<CError>? = nil
+		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		let resPointer = cExecute(connection, query, 1, timeout, errorPointer)
 
-		guard errorPointer == nil else {
-			throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
+		guard errorPointer.pointee.message == nil else {
+			throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
 		}
 
 		guard resPointer != nil else {
-			throw ODBCError.error(message: errorPointer != nil ? String(cString: errorPointer!.pointee.message) : "")
+			throw ODBCError.error(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : "")
 		}
 
 		return Result(resPointer: resPointer)

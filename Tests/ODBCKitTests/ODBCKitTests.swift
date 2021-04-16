@@ -9,7 +9,7 @@ import XCTest
 
 final class ODBCKitTests: XCTestCase {
 	func testExample() throws {
-		let conn = try Connection(.odbcString("Driver={PostgreSQL};Server=127.0.0.1;Database=lebje;Uid=lebje;"))
+		let conn = try Connection(.odbcString("Driver={PostgeSQL};Server=127.0.0.1;Database=lebje;Uid=lebje;"))
 
 		let res = try conn.execute(query: "SELECT * FROM table1;")
 
