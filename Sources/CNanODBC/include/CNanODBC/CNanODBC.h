@@ -1,9 +1,8 @@
+// Copyright (c) 2021 Jeff Lebrun
 //
-//  CNanoODBC.h
-//  
+//  Licensed under the MIT License.
 //
-//  Created by Jeff Lebrun on 4/12/21.
-//
+//  The full text of the license can be found in the file named LICENSE.
 
 #ifndef CNanODBC_h
 #define CNanODBC_h
@@ -52,8 +51,19 @@ extern "C"
 
 	typedef struct CDriver CDriver;
 
+enum ErrorReason {
+	general,
+	nullAccessError,
+	invalidType,
+	indexOutOfRange,
+	programmingError
+};
+
+typedef enum ErrorReason ErrorReason;
+
 	struct CError {
 		char * message;
+		ErrorReason reason;
 	};
 
 	typedef struct CError CError;
@@ -79,7 +89,7 @@ extern "C"
 		int16_t hour;
 		int16_t minute;
 		int16_t second;
-		int16_t fractionalSec;
+		int32_t fractionalSec;
 	};
 
 	typedef struct CTimeStamp CTimeStamp;
@@ -106,6 +116,8 @@ extern "C"
 	bool resultPrior(CResult * rawRes, CError * error);
 	int resultGetInt(CResult * rawRes, short colNum, CError * error);
 	char * resultGetString(CResult * rawRes, short colNum, CError * error);
+	CTime * resultGetTime(CResult * rawRes, short colNum, CError * error);
+	CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error);
 
 #ifdef __cplusplus
 }

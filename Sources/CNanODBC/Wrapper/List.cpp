@@ -1,9 +1,8 @@
+// Copyright (c) 2021 Jeff Lebrun
 //
-//  list.cpp
-//  
+//  Licensed under the MIT License.
 //
-//  Created by Jeff Lebrun on 4/13/21.
-//
+//  The full text of the license can be found in the file named LICENSE.
 
 #include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>

@@ -1,9 +1,8 @@
+// Copyright (c) 2021 Jeff Lebrun
 //
-//  Result.cpp
-//  
+//  Licensed under the MIT License.
 //
-//  Created by Jeff Lebrun on 4/15/21.
-//
+//  The full text of the license can be found in the file named LICENSE.
 
 #include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
@@ -58,6 +57,7 @@ extern "C" {
 			assert(error == NULL);
 			error = (CError *)malloc(sizeof(CError));
 			*error = CError { .message = strdup(e.what()) };
+			return -1;
 		}
 	}
 
@@ -71,4 +71,68 @@ extern "C" {
 			return NULL;
 		}
 	}
+
+	CTime * resultGetTime(CResult * rawRes, short colNum, CError * error) {
+		try {
+			auto time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(colNum);
+			CTime * cTime = (CTime *)malloc(sizeof(CTime));
+			*cTime = CTime { .hour = time.hour, .minute = time.min, .second = time.sec };
+			return cTime;
+		} catch (nanodbc::null_access_error& e) {
+			printf("\n%s\n", strdup(e.what()));
+			error = (CError *)malloc(sizeof(CError));
+			*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			return NULL;
+		} catch (nanodbc::type_incompatible_error& e) {
+			printf("\n%s\n", strdup(e.what()));
+			error = (CError *)malloc(sizeof(CError));
+			*error = CError { .message = strdup(e.what()), .reason = invalidType };
+			return NULL;
+		} catch (std::exception& e) {
+			assert(error == NULL);
+			error = (CError *)malloc(sizeof(CError));
+			*error = CError { .message = strdup(e.what()) };
+			return NULL;
+		}
+	}
+
+CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error) {
+	try {
+		auto timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colNum);
+		CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
+		*cTimeStamp = CTimeStamp {
+			.hour = timestamp.hour,
+			.minute = timestamp.min,
+			.second = timestamp.sec,
+			.fractionalSec = timestamp.fract,
+			.date = CDate { .year = timestamp.year, .month = timestamp.month, .day = timestamp.day }
+		};
+		return cTimeStamp;
+	} catch (nanodbc::null_access_error& e) {
+		printf("\n%s\n", strdup(e.what()));
+		error = (CError *)malloc(sizeof(CError));
+		*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
+		return NULL;
+	} catch (nanodbc::type_incompatible_error& e) {
+		printf("\n%s\n", strdup(e.what()));
+		error = (CError *)malloc(sizeof(CError));
+		*error = CError { .message = strdup(e.what()), .reason = invalidType };
+		return NULL;
+	} catch (nanodbc::index_range_error& e) {
+		printf("\n%s\n", strdup(e.what()));
+		error = (CError *)malloc(sizeof(CError));
+		*error = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+		return NULL;
+	} catch (nanodbc::programming_error& e) {
+		printf("\n%s\n", strdup(e.what()));
+		error = (CError *)malloc(sizeof(CError));
+		*error = CError { .message = strdup(e.what()), .reason = programmingError };
+		return NULL;
+	} catch (std::exception& e) {
+		assert(error == NULL);
+		error = (CError *)malloc(sizeof(CError));
+		*error = CError { .message = strdup(e.what()) };
+		return NULL;
+	}
+}
 }

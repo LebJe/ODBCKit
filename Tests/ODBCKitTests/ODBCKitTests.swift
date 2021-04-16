@@ -2,7 +2,7 @@
 //
 //  Licensed under the MIT License.
 //
-//  The full text license can be found in the file named LICENSE.
+//  The full text of the license can be found in the file named LICENSE.
 
 @testable import ODBCKit
 import XCTest
@@ -15,9 +15,10 @@ final class ODBCKitTests: XCTestCase {
 
 		print("-------------------------")
 		while try res.next() {
-			print("ID: \(try res.getInt(from: 0))")
-			print("Name: \(try res.getString(from: 1))")
-			print("EMail: \(try res.getString(from: 2))")
+			print("ID: \(try res.getInt(from: 0)!)")
+			print("Name: \(try res.getString(from: 1)!)")
+			print("EMail: \(try res.getString(from: 2)!)")
+			print("Time: \(try res.getTimeStamp(from: 3))")
 			print("-------------------------")
 		}
 	}

@@ -2,8 +2,15 @@
 //
 //  Licensed under the MIT License.
 //
-//  The full text license can be found in the file named LICENSE.
+//  The full text of the license can be found in the file named LICENSE.
 
 public enum ODBCError: Error {
 	case error(message: String)
+
+	/// The type you requested is not the type of the value in the specified column.
+	case invalidType
+
+	case indexOutOfRange
+
+	case programmingError(message: String)
 }
