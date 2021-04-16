@@ -6,7 +6,7 @@
 //
 
 #include <string>
-#include "nanodbc.h"
+#include "../nanodbc.h"
 
 std::string charToString(const char * string) {
 	return NANODBC_TEXT(string);

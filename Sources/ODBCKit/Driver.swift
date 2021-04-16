@@ -1,17 +1,13 @@
+// Copyright (c) 2021 Jeff Lebrun
 //
-//  Driver.swift
-//  
+//  Licensed under the MIT License.
 //
-//  Created by Jeff Lebrun on 4/13/21.
-//
+//  The full text license can be found in the file named LICENSE.
 
 import CNanODBC
 
-
-
 /// Attributes describe `Driver`s.
 public struct Attribute {
-
 	/// The name of the attribute.
 	public let keyword: String
 
@@ -23,9 +19,8 @@ public struct Attribute {
 	}
 }
 
-/// 
+///
 public struct Driver {
-
 	/// The name of the `Driver`.
 	public let name: String
 
@@ -33,7 +28,6 @@ public struct Driver {
 	public let attributes: [Attribute]
 
 	static func fromCDriver(_ driver: CDriver) -> Driver {
-
 		var attrArray: [Attribute] = []
 
 		if driver.attributes != nil {
@@ -41,7 +35,7 @@ public struct Driver {
 				attrArray.append(Attribute.fromCAttribute(driver.attributes![i]))
 			}
 		}
-		
+
 		return Driver(name: String(cString: driver.name), attributes: attrArray)
 	}
 

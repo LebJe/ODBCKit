@@ -5,7 +5,7 @@
 //  Created by Jeff Lebrun on 4/13/21.
 //
 
-#include "nanodbc.h"
+#include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
 #include <list>
 #include <stdlib.h>

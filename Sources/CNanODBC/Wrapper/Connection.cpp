@@ -5,7 +5,7 @@
 //  Created by Jeff Lebrun on 4/12/21.
 //
 
-#include "nanodbc.h"
+#include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
 
 extern "C" {
@@ -13,9 +13,9 @@ CConnection * createConnectionConnectionString(const char * connStr, long timeou
 		try {
 			return reinterpret_cast<CConnection *>( new nanodbc::connection(charToString(connStr), timeout) );
 		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what())};
-
+			CError cError = CError { .message = strdup(e.what()) };
 			*error = cError;
+			return NULL;
 		}
 	}
 
@@ -23,9 +23,9 @@ CConnection * createConnectionDSN(const char * dsn, const char * username, const
 		try {
 			return reinterpret_cast<CConnection *>( new nanodbc::connection(charToString(dsn), charToString(username), charToString(password), timeout) );
 		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what())};
-
+			CError cError = CError { .message = strdup(e.what()) };
 			*error = cError;
+			return NULL;
 		}
 	}
 

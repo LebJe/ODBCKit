@@ -20,6 +20,8 @@ extern "C"
 #endif
 
 	#include <stdbool.h>
+	#include <stdint.h>
+
 	// MARK: - Structs
 
 	struct CConnection;
@@ -56,6 +58,32 @@ extern "C"
 
 	typedef struct CError CError;
 
+	struct CDate {
+		int16_t year;
+		int16_t month;
+		int16_t day;
+	};
+
+	typedef struct CDate CDate;
+
+	struct CTime {
+		int16_t hour;
+		int16_t minute;
+		int16_t second;
+	};
+
+	typedef struct CTime CTime;
+
+	struct CTimeStamp {
+		CDate date;
+		int16_t hour;
+		int16_t minute;
+		int16_t second;
+		int16_t fractionalSec;
+	};
+
+	typedef struct CTimeStamp CTimeStamp;
+
 	// MARK: - Connection
 	CConnection * createConnectionConnectionString(const char * connStr, long timeout, CError * error);
 	CConnection * createConnectionDSN(const char * dsn, const char * username, const char * password, long timeout, CError * error);
@@ -74,7 +102,10 @@ extern "C"
 	long resultNumRows(CResult * rawRes);
 	short resultNumCols(CResult * rawRes);
 	bool resultHasAffectedRows(CResult * rawRes);
-	bool resultNext(CResult * rawRes);
+	bool resultNext(CResult * rawRes, CError * error);
+	bool resultPrior(CResult * rawRes, CError * error);
+	int resultGetInt(CResult * rawRes, short colNum, CError * error);
+	char * resultGetString(CResult * rawRes, short colNum, CError * error);
 
 #ifdef __cplusplus
 }

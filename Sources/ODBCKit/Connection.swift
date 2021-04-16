@@ -1,3 +1,9 @@
+// Copyright (c) 2021 Jeff Lebrun
+//
+//  Licensed under the MIT License.
+//
+//  The full text license can be found in the file named LICENSE.
+
 import CNanODBC
 
 public enum ConnectionType {
@@ -12,13 +18,13 @@ public class Connection {
 	public init(_ connectionType: ConnectionType, timeout: Int = 0) throws {
 		self.connectionType = connectionType
 		switch connectionType {
-			case .odbcString(let connStr):
+			case let .odbcString(connStr):
 				let errorPointer: UnsafeMutablePointer<CError>? = nil
 
 				if let c = createConnectionConnectionString(connStr, timeout, errorPointer), errorPointer == nil {
 					self.connection = c
 				} else {
-					throw ConnectionError.error(message: String(cString: errorPointer!.pointee.message))
+					throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
 				}
 
 			case let .dataSource(dsn: dsn, username: username, password: password):
@@ -27,20 +33,20 @@ public class Connection {
 				if let c = createConnectionDSN(dsn, username, password, timeout, errorPointer), errorPointer == nil {
 					self.connection = c
 				} else {
-					throw ConnectionError.error(message: String(cString: errorPointer!.pointee.message))
+					throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
 				}
 		}
 	}
 
-	//deinit { destroyConnection(connection) }
+	// deinit { destroyConnection(connection) }
 
 	public func justExecute(query: String, timeout: Int = 0) throws {
 		let errorPointer: UnsafeMutablePointer<CError>? = nil
 
-		CNanODBC.justExecute(connection, query, 1, timeout, errorPointer)
+		CNanODBC.justExecute(self.connection, query, 1, timeout, errorPointer)
 
 		guard errorPointer == nil else {
-			throw ConnectionError.error(message: String(cString: errorPointer!.pointee.message))
+			throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
 		}
 	}
 
@@ -49,11 +55,11 @@ public class Connection {
 		let resPointer = cExecute(connection, query, 1, timeout, errorPointer)
 
 		guard errorPointer == nil else {
-			throw ConnectionError.error(message: String(cString: errorPointer!.pointee.message))
+			throw ODBCError.error(message: String(cString: errorPointer!.pointee.message))
 		}
 
 		guard resPointer != nil else {
-			throw ConnectionError.error(message: errorPointer != nil ? String(cString: errorPointer!.pointee.message) : "")
+			throw ODBCError.error(message: errorPointer != nil ? String(cString: errorPointer!.pointee.message) : "")
 		}
 
 		return Result(resPointer: resPointer)

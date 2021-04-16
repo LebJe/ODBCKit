@@ -1,15 +1,13 @@
+// Copyright (c) 2021 Jeff Lebrun
 //
-//  File.swift
-//  
+//  Licensed under the MIT License.
 //
-//  Created by Jeff Lebrun on 4/13/21.
-//
+//  The full text license can be found in the file named LICENSE.
 
 import CNanODBC
 
 /// An ODBC data source.
 public struct DataSource {
-
 	/// The name of the data source.
 	public let name: String
 
