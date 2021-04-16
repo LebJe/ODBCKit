@@ -1,0 +1,5 @@
+module CNanoODBC {
+	link "odbc"
+	header "CNanoODBC.h"
+	export *
+}
