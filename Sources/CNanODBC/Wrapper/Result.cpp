@@ -19,12 +19,24 @@ extern "C" {
 		return reinterpret_cast<nanodbc::result *>(rawRes)->rows();
 	}
 
-	short resultNumCols(CResult * rawRes) {
-		return reinterpret_cast<nanodbc::result *>(rawRes)->columns();
+	short resultNumCols(CResult * rawRes, CError * error) {
+		try {
+			return reinterpret_cast<nanodbc::result *>(rawRes)->columns();
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return false;
+		}
 	}
 
-	bool resultHasAffectedRows(CResult * rawRes) {
-		return reinterpret_cast<nanodbc::result *>(rawRes)->has_affected_rows();
+	bool resultHasAffectedRows(CResult * rawRes, CError * error) {
+		try {
+			return reinterpret_cast<nanodbc::result *>(rawRes)->affected_rows();
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return false;
+		}
 	}
 
 	// MARK: - Next and Prior
@@ -32,8 +44,8 @@ extern "C" {
 	bool resultNext(CResult * rawRes, CError * error) {
 		try {
 			return reinterpret_cast<nanodbc::result *>(rawRes)->next();
-		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what()) };
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
 			return false;
 		}
@@ -42,10 +54,9 @@ extern "C" {
 	bool resultPrior(CResult * rawRes, CError * error) {
 		try {
 			return reinterpret_cast<nanodbc::result *>(rawRes)->prior();
-		} catch (std::exception& e) {
-			CError * cError = (CError *)malloc(sizeof(CError));
-			cError->message = strdup(e.what());
-			error = cError;
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
 			return false;
 		}
 	}
@@ -53,10 +64,22 @@ extern "C" {
 	int resultGetInt(CResult * rawRes, short colNum, CError * error) {
 		try {
 			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(colNum);
-		} catch (std::exception& e) {
-			assert(error == NULL);
-			error = (CError *)malloc(sizeof(CError));
-			*error = CError { .message = strdup(e.what()) };
+			// database_error, index_range_error, type_incompatible_error, null_access_error
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return -1;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
+			return -1;
+		} catch (nanodbc::type_incompatible_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
+			return -1;
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
 			return -1;
 		}
 	}
@@ -64,10 +87,21 @@ extern "C" {
 	char * resultGetString(CResult * rawRes, short colNum, CError * error) {
 		try {
 			return strdup(reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::string>(colNum).c_str());
-		} catch (std::exception& e) {
-			assert(error == NULL);
-			error = (CError *)malloc(sizeof(CError));
-			*error = CError { .message = strdup(e.what()) };
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::type_incompatible_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
 			return NULL;
 		}
 	}
@@ -78,70 +112,120 @@ extern "C" {
 			CTime * cTime = (CTime *)malloc(sizeof(CTime));
 			*cTime = CTime { .hour = time.hour, .minute = time.min, .second = time.sec };
 			return cTime;
-		} catch (nanodbc::null_access_error& e) {
-			printf("\n%s\n", strdup(e.what()));
-			error = (CError *)malloc(sizeof(CError));
-			*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
 			return NULL;
 		} catch (nanodbc::type_incompatible_error& e) {
-			printf("\n%s\n", strdup(e.what()));
-			error = (CError *)malloc(sizeof(CError));
-			*error = CError { .message = strdup(e.what()), .reason = invalidType };
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
 			return NULL;
-		} catch (std::exception& e) {
-			assert(error == NULL);
-			error = (CError *)malloc(sizeof(CError));
-			*error = CError { .message = strdup(e.what()) };
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
 			return NULL;
 		}
 	}
 
-CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error) {
-	try {
-		auto timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colNum);
-		CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
-		*cTimeStamp = CTimeStamp {
-			.hour = timestamp.hour,
-			.minute = timestamp.min,
-			.second = timestamp.sec,
-			.fractionalSec = timestamp.fract,
-			.date = CDate { .year = timestamp.year, .month = timestamp.month, .day = timestamp.day }
-		};
-		return cTimeStamp;
-	} catch (nanodbc::null_access_error& e) {
-		printf("\n%s\n", strdup(e.what()));
-		*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
-
-		//error = (CError *)malloc(sizeof(CError));
-		//*error = CError { .message = strdup(e.what()), .reason = nullAccessError };
-		return NULL;
-	} catch (nanodbc::type_incompatible_error& e) {
-		printf("\n%s\n", strdup(e.what()));
-		CError * errorPointer = new CError;
-		errorPointer->message = strdup(e.what());
-		errorPointer->reason = invalidType;
-		error = (CError *)malloc(sizeof(CError));
-		memcpy(error, errorPointer, sizeof(CError));
-		return NULL;
-	} catch (nanodbc::index_range_error& e) {
-		printf("\n%s\n", strdup(e.what()));
-		CError * errorPointer = new CError;
-		errorPointer->message = strdup(e.what());
-		errorPointer->reason = indexOutOfRange;
-		memcpy(error, errorPointer, sizeof(CError));
-		return NULL;
-	} catch (nanodbc::programming_error& e) {
-		printf("\n%s\n", strdup(e.what()));
-		CError * errorPointer = new CError;
-		errorPointer->message = strdup(e.what());
-		errorPointer->reason = programmingError;
-		error = errorPointer;
-		return NULL;
-	} catch (std::exception& e) {
-		assert(error == NULL);
-		error = (CError *)malloc(sizeof(CError));
-		*error = CError { .message = strdup(e.what()) };
-		return NULL;
+	CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error) {
+		try {
+			auto timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colNum);
+			CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
+			*cTimeStamp = CTimeStamp {
+				.hour = timestamp.hour,
+				.minute = timestamp.min,
+				.second = timestamp.sec,
+				.fractionalSec = timestamp.fract,
+				.date = CDate { .year = timestamp.year, .month = timestamp.month, .day = timestamp.day }
+			};
+			return cTimeStamp;
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::type_incompatible_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
+			return NULL;
+		}
 	}
-}
+
+	CDate * resultGetDate(CResult * rawRes, short colNum, CError * error) {
+		try {
+			auto date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(colNum);
+			return new CDate { .month = date.month, .day = date.day, .year = date.year };
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::type_incompatible_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
+			return NULL;
+		}
+	}
+
+	bool resultGetBool(CResult * rawRes, short colNum, CError * error) {
+		try {
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(colNum);
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::type_incompatible_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
+			return NULL;
+		}
+	}
+
+	uint8_t * resultGetBinary(CResult * rawRes, short colNum, CError * error) {
+		try {
+			reinterpret_cast<nanodbc::result *>(rawRes)->get<uint8_t *>(colNum);
+		} catch (nanodbc::database_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::index_range_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::type_incompatible_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
+			*error = cError;
+			return NULL;
+		} catch (nanodbc::null_access_error& e) {
+			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
+			*error = cError;
+			return NULL;
+		}
+	}
 }

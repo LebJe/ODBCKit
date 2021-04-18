@@ -5,7 +5,7 @@
 //  The full text of the license can be found in the file named LICENSE.
 
 public enum ODBCError: Error {
-	case error(message: String)
+	case general(message: String? = nil)
 
 	/// The type you requested is not the type of the value in the specified column.
 	case invalidType
@@ -13,4 +13,6 @@ public enum ODBCError: Error {
 	case indexOutOfRange
 
 	case programmingError(message: String)
+
+	case databaseError(message: String)
 }

@@ -56,7 +56,8 @@ enum ErrorReason {
 	nullAccessError,
 	invalidType,
 	indexOutOfRange,
-	programmingError
+	programmingError,
+	databaseError
 };
 
 typedef enum ErrorReason ErrorReason;
@@ -110,14 +111,17 @@ typedef enum ErrorReason ErrorReason;
 	// MARK: - Result
 	long resultAffectedRows(CResult * rawRes);
 	long resultNumRows(CResult * rawRes);
-	short resultNumCols(CResult * rawRes);
-	bool resultHasAffectedRows(CResult * rawRes);
+	short resultNumCols(CResult * rawRes, CError * error);
+	bool resultHasAffectedRows(CResult * rawRes, CError * error);
 	bool resultNext(CResult * rawRes, CError * error);
 	bool resultPrior(CResult * rawRes, CError * error);
 	int resultGetInt(CResult * rawRes, short colNum, CError * error);
 	char * resultGetString(CResult * rawRes, short colNum, CError * error);
 	CTime * resultGetTime(CResult * rawRes, short colNum, CError * error);
 	CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error);
+	CDate * resultGetDate(CResult * rawRes, short colNum, CError * error);
+	uint8_t * resultGetBinary(CResult * rawRes, short colNum, CError * error);
+	bool resultGetBool(CResult * rawRes, short colNum, CError * error);
 
 #ifdef __cplusplus
 }

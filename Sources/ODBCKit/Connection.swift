@@ -24,7 +24,12 @@ public class Connection {
 				if let c = createConnectionConnectionString(connStr, timeout, errorPointer), errorPointer.pointee.message == nil {
 					self.connection = c
 				} else {
-					throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
+					switch errorPointer.pointee.reason {
+						case databaseError:
+							throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
+						default:
+							throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
+					}
 				}
 
 			case let .dataSource(dsn: dsn, username: username, password: password):
@@ -33,7 +38,12 @@ public class Connection {
 				if let c = createConnectionDSN(dsn, username, password, timeout, errorPointer), errorPointer.pointee.message == nil {
 					self.connection = c
 				} else {
-					throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
+					switch errorPointer.pointee.reason {
+						case databaseError:
+							throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
+						default:
+							throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
+					}
 				}
 		}
 	}
@@ -46,7 +56,7 @@ public class Connection {
 		CNanODBC.justExecute(self.connection, query, 1, timeout, errorPointer)
 
 		guard errorPointer.pointee.message == nil else {
-			throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
+			throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
 		}
 	}
 
@@ -55,11 +65,11 @@ public class Connection {
 		let resPointer = cExecute(connection, query, 1, timeout, errorPointer)
 
 		guard errorPointer.pointee.message == nil else {
-			throw ODBCError.error(message: String(cString: errorPointer.pointee.message))
+			throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
 		}
 
 		guard resPointer != nil else {
-			throw ODBCError.error(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : "")
+			throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
 		}
 
 		return Result(resPointer: resPointer)

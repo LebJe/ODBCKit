@@ -19,9 +19,9 @@ public struct Time {
 }
 
 public struct Date {
-	public let year: Int
-	public let month: Int
 	public let day: Int
+	public let month: Int
+	public let year: Int
 
 	init(cDate: CDate) {
 		self.year = Int(cDate.year)

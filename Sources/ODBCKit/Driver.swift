@@ -14,8 +14,13 @@ public struct Attribute {
 	/// The value of the attribute.
 	public let value: String
 
-	static func fromCAttribute(_ attr: CAttribute) -> Attribute {
-		Attribute(keyword: String(cString: attr.keyword), value: String(cString: attr.value))
+	init(keyword: String, value: String) {
+		self.keyword = keyword
+		self.value = value
+	}
+
+	init(cAttribute: CAttribute) {
+		self = Self(keyword: String(cString: cAttribute.keyword), value: String(cString: cAttribute.value))
 	}
 }
 
@@ -27,16 +32,21 @@ public struct Driver {
 	/// The `Attribute`s describing the `Driver`.
 	public let attributes: [Attribute]
 
-	static func fromCDriver(_ driver: CDriver) -> Driver {
+	init(name: String, attributes: [Attribute]) {
+		self.name = name
+		self.attributes = attributes
+	}
+
+	init(cDriver: CDriver) {
 		var attrArray: [Attribute] = []
 
-		if driver.attributes != nil {
-			for i in 0..<Int(driver.attrSize.pointee) {
-				attrArray.append(Attribute.fromCAttribute(driver.attributes![i]))
+		if cDriver.attributes != nil {
+			for i in 0..<Int(cDriver.attrSize.pointee) {
+				attrArray.append(Attribute(cAttribute: cDriver.attributes![i]))
 			}
 		}
 
-		return Driver(name: String(cString: driver.name), attributes: attrArray)
+		self = Self(name: String(cString: cDriver.name), attributes: attrArray)
 	}
 
 	/// Retrieve a list of all the installed `Driver`s.
@@ -47,7 +57,7 @@ public struct Driver {
 
 		if drivers != nil {
 			for i in 0..<Int(size) {
-				driverArray.append(Driver.fromCDriver(drivers![i]))
+				driverArray.append(Driver(cDriver: drivers![i]))
 			}
 
 			return driverArray
