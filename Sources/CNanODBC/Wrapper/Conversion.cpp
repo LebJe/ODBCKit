@@ -4,10 +4,10 @@
 //
 //  The full text of the license can be found in the file named LICENSE.
 
-#include <string>
 #include "../nanodbc.h"
+#include <CNanODBC/CNanODBC.h>
 #include <CNanODBC/CxxFuncs.h>
 
-std::string charToString(const char * string) {
-	return NANODBC_TEXT(string);
+nanodbc::date cDateToDate(CDate date) {
+	return nanodbc::date { .year = date.year, .month = date.month, .day = date.day };
 }

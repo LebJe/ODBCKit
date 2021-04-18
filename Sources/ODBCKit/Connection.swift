@@ -13,7 +13,7 @@ public enum ConnectionType {
 
 public class Connection {
 	public let connectionType: ConnectionType
-	private let connection: OpaquePointer
+	internal let connection: OpaquePointer
 
 	public init(_ connectionType: ConnectionType, timeout: Int = 0) throws {
 		self.connectionType = connectionType

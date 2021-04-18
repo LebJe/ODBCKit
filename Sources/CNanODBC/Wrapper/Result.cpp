@@ -7,7 +7,7 @@
 #include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
 #include <stdbool.h>
-
+#include <CNanODBC/CxxFuncs.h>
 extern "C" {
 
 	// MARK: - Result Information

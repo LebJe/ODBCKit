@@ -28,6 +28,10 @@ public struct Date {
 		self.month = Int(cDate.month)
 		self.day = Int(cDate.day)
 	}
+
+	var cDate: CDate {
+		CDate(year: Int16(self.year), month: Int16(self.month), day: Int16(self.day))
+	}
 }
 
 public struct TimeStamp {

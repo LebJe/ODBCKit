@@ -7,14 +7,15 @@
 #include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
 #include <cstring>
-#include <malloc/_malloc.h>
+//#include <malloc/_malloc.h>
+#include <CNanODBC/CxxFuncs.h>
 
 extern "C" {
 	void justExecute(CConnection * rawConn, const char * query, long batchOperations, long timeout, CError * error) {
 		try {
 			nanodbc::just_execute(*reinterpret_cast<nanodbc::connection *>(rawConn), charToString(query), batchOperations, timeout);
 		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what()) };
+			CError cError = CError { .message = strdup(e.what()), .reason = general };
 			*error = cError;
 		}
 	}
@@ -23,7 +24,7 @@ extern "C" {
 		try {
 			return reinterpret_cast<CResult *>(new nanodbc::result(nanodbc::execute(*reinterpret_cast<nanodbc::connection *>(rawConn), charToString(query), batchOperations, timeout)));
 		} catch (std::exception& e) {
-			CError cError = CError { .message = strdup(e.what()) };
+			CError cError = CError { .message = strdup(e.what()), .reason = general };
 			*error = cError;
 			return NULL;
 		}

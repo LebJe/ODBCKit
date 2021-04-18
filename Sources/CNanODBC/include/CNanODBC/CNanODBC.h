@@ -11,11 +11,7 @@
 
 #include <string>
 
-
-std::string charToString(const char * string);
-
-extern "C"
-{
+extern "C" {
 #endif
 
 	#include <stdbool.h>
@@ -28,6 +24,9 @@ extern "C"
 
 	struct CResult;
 	typedef struct CResult CResult;
+
+	struct CStatement;
+	typedef struct CStatement CStatement;
 
 	struct CDataSource {
 		const char * name;
@@ -128,6 +127,11 @@ typedef enum ErrorReason ErrorReason;
 	CDate * resultGetDate(CResult * rawRes, short colNum, CError * error);
 	bool resultGetBool(CResult * rawRes, short colNum, CError * error);
 	uint8_t * resultGetBinary(CResult * rawRes, short colNum, int * sizePointer, CError * error);
+
+	// MARK: - Statement
+
+	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout);
+	void stmtClose(CStatement * rawStmt);
 
 #ifdef __cplusplus
 }

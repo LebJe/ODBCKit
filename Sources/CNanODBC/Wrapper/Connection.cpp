@@ -6,6 +6,7 @@
 
 #include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
+#include <CNanODBC/CxxFuncs.h>
 
 extern "C" {
 CConnection * createConnectionConnectionString(const char * connStr, long timeout, CError * error) {
