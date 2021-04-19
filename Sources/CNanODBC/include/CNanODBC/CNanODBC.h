@@ -133,6 +133,7 @@ typedef enum ErrorReason ErrorReason;
 	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout);
 	CError * stmtBindInt(CStatement * rawStmt, short paramIndex, int value);
 	CError * stmtBindString(CStatement * rawStmt, short paramIndex, const char * value);
+	CResult * stmtExecute(CStatement * rawStmt, CError * error);
 	void stmtClose(CStatement * rawStmt);
 
 #ifdef __cplusplus

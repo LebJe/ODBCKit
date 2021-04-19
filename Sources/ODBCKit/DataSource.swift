@@ -14,8 +14,13 @@ public struct DataSource {
 	/// The driver associated with the data source.
 	public let driver: String
 
-	static func fromCDataSource(_ dataSource: CDataSource) -> DataSource {
-		DataSource(name: String(cString: dataSource.name), driver: String(cString: dataSource.driver))
+	init(name: String, driver: String) {
+		self.name = name
+		self.driver = driver
+	}
+
+	init(cDataSource: CDataSource) {
+		self = DataSource(name: String(cString: cDataSource.name), driver: String(cString: cDataSource.driver))
 	}
 
 	public static func all() -> [DataSource] {
@@ -25,7 +30,7 @@ public struct DataSource {
 
 		if dataSources != nil {
 			for i in 0..<Int(size) {
-				dataSourceArray.append(DataSource.fromCDataSource(dataSources![i]))
+				dataSourceArray.append(DataSource(cDataSource: dataSources![i]))
 			}
 
 			return dataSourceArray

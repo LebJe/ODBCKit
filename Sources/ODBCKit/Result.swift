@@ -40,7 +40,7 @@ public struct Result {
 	}
 
 	/// Advances to the next row in the `Result`.
-	/// - Throws: `ConnectionError`.
+	/// - Throws: `ODBCError`.
 	/// - Returns: `true` if `next` successfully advanced to the next row, `false` otherwise.
 	public func next() throws -> Bool {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
@@ -55,7 +55,7 @@ public struct Result {
 	}
 
 	/// Returns to the previous row in the `Result`.
-	/// - Throws: `ConnectionError`.
+	/// - Throws: `ODBCError`.
 	/// - Returns: `true` if `previous` successfully returned to the previous row, `false` otherwise.
 	public func previous() throws -> Bool {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)

@@ -13,7 +13,26 @@ public class Statement {
 		self.statementPointer = CNanODBC.stmtCreate(connection.connection, query, timeout)
 	}
 
-	deinit {
-		stmtClose(statementPointer)
+	public func execute(with values: [ODBCValue]) throws -> Result {
+		for i in 0..<values.count {
+			try values[i].bind(stmtPointer: self.statementPointer, index: i)
+		}
+		// try values.enumerated().forEach({ try $0.element.bind(stmtPointer: statementPointer, index: $0.offset) })
+
+		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
+		let resPointer = stmtExecute(statementPointer, errorPointer)
+
+		if errorPointer.pointee.message != nil {
+			switch errorPointer.pointee.reason {
+				case databaseError: throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
+				default: throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
+			}
+		}
+
+		return Result(resPointer: resPointer)
 	}
+
+//	deinit {
+//		stmtClose(statementPointer)
+//	}
 }

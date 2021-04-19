@@ -6,7 +6,7 @@
 
 import CNanODBC
 
-enum ODBCValueType {
+public enum ODBCValueType {
 	case int,
 	     int8,
 	     int16,
@@ -23,12 +23,12 @@ enum ODBCValueType {
 	     bytes
 }
 
-protocol ODBCValue {
+public protocol ODBCValue {
 	var type: ODBCValueType { get }
 	func bind(stmtPointer: OpaquePointer, index: Int) throws
 }
 
-extension ODBCValue {
+public extension ODBCValue {
 	var odbcValue: Self {
 		self
 	}
@@ -46,28 +46,28 @@ extension ODBCValue {
 	}
 }
 
-extension Int: ODBCValue { var type: ODBCValueType { .int } }
-extension Int8: ODBCValue { var type: ODBCValueType { .int8 } }
-extension Int16: ODBCValue { var type: ODBCValueType { .int16 } }
-extension Int32: ODBCValue { var type: ODBCValueType { .int32 } }
-extension Int64: ODBCValue { var type: ODBCValueType { .int64 } }
-extension UInt16: ODBCValue { var type: ODBCValueType { .uint16 } }
-extension Float: ODBCValue { var type: ODBCValueType { .float } }
-extension Double: ODBCValue { var type: ODBCValueType { .double } }
-extension String: ODBCValue { var type: ODBCValueType { .string } }
-extension Bool: ODBCValue { var type: ODBCValueType { .bool } }
+extension Int: ODBCValue { public var type: ODBCValueType { .int } }
+extension Int8: ODBCValue { public var type: ODBCValueType { .int8 } }
+extension Int16: ODBCValue { public var type: ODBCValueType { .int16 } }
+extension Int32: ODBCValue { public var type: ODBCValueType { .int32 } }
+extension Int64: ODBCValue { public var type: ODBCValueType { .int64 } }
+extension UInt16: ODBCValue { public var type: ODBCValueType { .uint16 } }
+extension Float: ODBCValue { public var type: ODBCValueType { .float } }
+extension Double: ODBCValue { public var type: ODBCValueType { .double } }
+extension String: ODBCValue { public var type: ODBCValueType { .string } }
+extension Bool: ODBCValue { public var type: ODBCValueType { .bool } }
 
 extension Date: ODBCValue {
-	var odbcValue: CDate { self.cDate }
-	var type: ODBCValueType { .date }
+	public var odbcValue: CDate { self.cDate }
+	public var type: ODBCValueType { .date }
 }
 
 extension Time: ODBCValue {
-	var odbcValue: CTime { self.cTime }
-	var type: ODBCValueType { .time }
+	public var odbcValue: CTime { self.cTime }
+	public var type: ODBCValueType { .time }
 }
 
 extension TimeStamp: ODBCValue {
-	var odbcValue: CTimeStamp { self.cTimestamp }
-	var type: ODBCValueType { .timestamp }
+	public var odbcValue: CTimeStamp { self.cTimestamp }
+	public var type: ODBCValueType { .timestamp }
 }

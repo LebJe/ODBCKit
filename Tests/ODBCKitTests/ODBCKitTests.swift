@@ -11,7 +11,11 @@ final class ODBCKitTests: XCTestCase {
 	func testExample() throws {
 		let conn = try Connection(.odbcString("Driver={PostgreSQL};Server=127.0.0.1;Database=lebje;Uid=lebje;"))
 
-		let res = try conn.execute(query: "SELECT \"date\" FROM \"dataTypes\";")
+		let res = try conn
+			.statement(query: "SELECT \"float\" FROM \"dataTypes\" WHERE \"string\" = ?;")
+			.execute(with: ["string 1"])
+
+		// print(try res.columns())
 
 		print("-------------------------")
 		while try res.next() {
@@ -19,7 +23,7 @@ final class ODBCKitTests: XCTestCase {
 //			print("Name: \(try res.getString(from: 1)!)")
 //			print("EMail: \(try res.getString(from: 2)!)")
 //			print("Time: \(try res.getTimeStamp(from: 3)!)")
-			print(try res.getDate(from: "date"))
+			print(try res.getFloat(from: 0))
 			print("-------------------------")
 		}
 	}

@@ -50,6 +50,10 @@ public class Connection {
 
 	// deinit { destroyConnection(connection) }
 
+	public func statement(query: String) -> Statement {
+		.init(connection: self, query: query)
+	}
+
 	public func justExecute(query: String, timeout: Int = 0) throws {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 

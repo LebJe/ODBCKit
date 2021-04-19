@@ -32,8 +32,6 @@ extern "C" {
 		}
 	}
 
-
-
 	// MARK: - Execute
 	CResult * stmtExecute(CStatement * rawStmt, CError * error) {
 		try {
