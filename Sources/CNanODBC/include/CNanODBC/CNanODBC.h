@@ -131,6 +131,8 @@ typedef enum ErrorReason ErrorReason;
 	// MARK: - Statement
 
 	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout);
+	CError * stmtBindInt(CStatement * rawStmt, short paramIndex, int value);
+	CError * stmtBindString(CStatement * rawStmt, short paramIndex, const char * value);
 	void stmtClose(CStatement * rawStmt);
 
 #ifdef __cplusplus

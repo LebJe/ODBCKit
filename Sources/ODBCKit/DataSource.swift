@@ -19,6 +19,8 @@ public struct DataSource {
 	}
 
 	public static func all() -> [DataSource] {
+		let a: [Any] = [0, ""]
+
 		var size: Int32 = 0
 		var dataSourceArray: [DataSource] = []
 		let dataSources = listDataSources(&size)

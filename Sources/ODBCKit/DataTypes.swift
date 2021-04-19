@@ -16,6 +16,10 @@ public struct Time {
 		self.minute = Int(cTime.minute)
 		self.second = Int(cTime.second)
 	}
+
+	var cTime: CTime {
+		CTime(hour: Int16(self.hour), minute: Int16(self.minute), second: Int16(self.second))
+	}
 }
 
 public struct Date {
@@ -47,5 +51,15 @@ public struct TimeStamp {
 		self.minute = Int(cTimeStamp.minute)
 		self.second = Int(cTimeStamp.second)
 		self.fractionalSecond = Int(cTimeStamp.fractionalSec)
+	}
+
+	var cTimestamp: CTimeStamp {
+		CTimeStamp(
+			date: self.date.cDate,
+			hour: Int16(self.hour),
+			minute: Int16(self.minute),
+			second: Int16(self.second),
+			fractionalSec: Int32(self.fractionalSecond)
+		)
 	}
 }

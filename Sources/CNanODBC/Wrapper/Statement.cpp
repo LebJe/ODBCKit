@@ -9,14 +9,32 @@
 #include <CNanODBC/CxxFuncs.h>
 
 extern "C" {
+	// MARK: - Create
 	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout) {
 		return reinterpret_cast<CStatement *>( new nanodbc::statement(*reinterpret_cast<nanodbc::connection *>(rawConn), charToString(query), timeout) );
 	}
 
+	// MARK: - Bind
+
 	CError * stmtBindInt(CStatement * rawStmt, short paramIndex, int value) {
-		reinterpret_cast<nanodbc::statement *>(rawStmt)->bind(paramIndex, &value);
+		try {
+			reinterpret_cast<nanodbc::statement *>(rawStmt)->bind(paramIndex, &value);
+		} catch (nanodbc::database_error& e) {
+			return new CError { .message = strdup(e.what()), .reason = databaseError };
+		}
 	}
 
+	CError * stmtBindString(CStatement * rawStmt, short paramIndex, const char * value) {
+		try {
+			reinterpret_cast<nanodbc::statement *>(rawStmt)->bind(paramIndex, value);
+		} catch (nanodbc::database_error& e) {
+			return new CError { .message = strdup(e.what()), .reason = databaseError };
+		}
+	}
+
+
+
+	// MARK: - Execute
 	CResult * stmtExecute(CStatement * rawStmt, CError * error) {
 		try {
 			return reinterpret_cast<CResult *>(new nanodbc::result(reinterpret_cast<nanodbc::statement *>(rawStmt)->execute()));

@@ -7,7 +7,6 @@
 #include "../nanodbc.h"
 #include <CNanODBC/CNanODBC.h>
 #include <cstring>
-//#include <malloc/_malloc.h>
 #include <CNanODBC/CxxFuncs.h>
 
 extern "C" {

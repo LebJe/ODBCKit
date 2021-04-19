@@ -16,5 +16,8 @@
 std::string charToString(const char * string);
 
 nanodbc::date cDateToDate(CDate date);
+nanodbc::time cTimeToTime(CTime time);
+
+nanodbc::timestamp cTimeStampToTimestamp(CTimeStamp ts);
 #endif
 #endif /* Header_h */
