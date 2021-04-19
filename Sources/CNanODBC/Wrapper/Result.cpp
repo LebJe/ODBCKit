@@ -61,9 +61,14 @@ extern "C" {
 		}
 	}
 
-	short resultGetShort(CResult * rawRes, short colNum, CError * error) {
+	// MARK: - Get data through column index
+
+	short resultGetShort(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<short>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<short>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<short>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -83,9 +88,12 @@ extern "C" {
 		}
 	}
 
-	unsigned short resultGetUnsignedShort(CResult * rawRes, short colNum, CError * error) {
+	unsigned short resultGetUnsignedShort(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<unsigned short>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<unsigned short>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<unsigned short>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -105,9 +113,13 @@ extern "C" {
 		}
 	}
 
-	int resultGetInt(CResult * rawRes, short colNum, CError * error) {
+	int resultGetInt(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(*colNum);
+			}
+
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -127,9 +139,12 @@ extern "C" {
 		}
 	}
 
-	int64_t resultGetBigInt(CResult * rawRes, short colNum, CError * error) {
+	int64_t resultGetBigInt(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int64_t>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<int64_t>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int64_t>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -149,9 +164,12 @@ extern "C" {
 		}
 	}
 
-	int32_t resultGetLong(CResult * rawRes, short colNum, CError * error) {
+	int32_t resultGetLong(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int32_t>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<int32_t>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int32_t>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -171,9 +189,12 @@ extern "C" {
 		}
 	}
 
-	float resultGetFloat(CResult * rawRes, short colNum, CError * error) {
+	float resultGetFloat(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<float>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<float>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<float>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -193,9 +214,12 @@ extern "C" {
 		}
 	}
 
-	double resultGetDouble(CResult * rawRes, short colNum, CError * error) {
+	double resultGetDouble(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<double>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<double>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<double>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -215,9 +239,12 @@ extern "C" {
 		}
 	}
 
-	char * resultGetString(CResult * rawRes, short colNum, CError * error) {
+	char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return strdup(reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::string>(colNum).c_str());
+			if (colNum != NULL) {
+				return strdup(reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::string>(*colNum).c_str());
+			}
+			return strdup(reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::string>(colName).c_str());
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -237,9 +264,15 @@ extern "C" {
 		}
 	}
 
-	CTime * resultGetTime(CResult * rawRes, short colNum, CError * error) {
+	CTime * resultGetTime(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			auto time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(colNum);
+			nanodbc::time time;
+
+			if (colNum != NULL) {
+				time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(*colNum);
+			}
+
+			time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(colName);
 			CTime * cTime = (CTime *)malloc(sizeof(CTime));
 			*cTime = CTime { .hour = time.hour, .minute = time.min, .second = time.sec };
 			return cTime;
@@ -262,10 +295,17 @@ extern "C" {
 		}
 	}
 
-	CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error) {
+	CTimeStamp * resultGetTimeStamp(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			auto timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colNum);
+			nanodbc::timestamp timestamp;
+
+			if (colNum != NULL) {
+				timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(*colNum);
+			}
+
+			timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colName);
 			CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
+
 			*cTimeStamp = CTimeStamp {
 				.hour = timestamp.hour,
 				.minute = timestamp.min,
@@ -293,9 +333,15 @@ extern "C" {
 		}
 	}
 
-	CDate * resultGetDate(CResult * rawRes, short colNum, CError * error) {
+	CDate * resultGetDate(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			auto date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(colNum);
+			nanodbc::date date;
+
+			if (colNum != NULL) {
+				date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(*colNum);
+			}
+
+			date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(colName);
 			return new CDate { .month = date.month, .day = date.day, .year = date.year };
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
@@ -316,9 +362,12 @@ extern "C" {
 		}
 	}
 
-	bool resultGetBool(CResult * rawRes, short colNum, CError * error) {
+	bool resultGetBool(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
-			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(colNum);
+			if (colNum != NULL) {
+				return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(*colNum);
+			}
+			return reinterpret_cast<nanodbc::result *>(rawRes)->get<int>(colName);
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
@@ -338,9 +387,15 @@ extern "C" {
 		}
 	}
 
-	uint8_t * resultGetBinary(CResult * rawRes, short colNum, int * sizePointer, CError * error) {
+	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, int * sizePointer, CError * error) {
 		try {
-			auto res = reinterpret_cast<nanodbc::result *>(rawRes)->get<std::vector<uint8_t>>(colNum);
+			std::vector<uint8_t> res;
+			if (colNum != NULL) {
+				res = reinterpret_cast<nanodbc::result *>(rawRes)->get<std::vector<uint8_t>>(colName);
+			}
+
+			res = reinterpret_cast<nanodbc::result *>(rawRes)->get<std::vector<uint8_t>>(*colNum);
+
 			uint8_t * rawRes = (uint8_t *)malloc(sizeof(uint8_t) * res.size());
 
 			for (int i = 0; i < res.size(); i++) {

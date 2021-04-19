@@ -114,19 +114,19 @@ typedef enum ErrorReason ErrorReason;
 	bool resultHasAffectedRows(CResult * rawRes, CError * error);
 	bool resultNext(CResult * rawRes, CError * error);
 	bool resultPrior(CResult * rawRes, CError * error);
-	short resultGetShort(CResult * rawRes, short colNum, CError * error);
-	unsigned short resultGetUnsignedShort(CResult * rawRes, short colNum, CError * error);
-	int resultGetInt(CResult * rawRes, short colNum, CError * error);
-	int64_t resultGetBigInt(CResult * rawRes, short colNum, CError * error);
-	int32_t resultGetLong(CResult * rawRes, short colNum, CError * error);
-	float resultGetFloat(CResult * rawRes, short colNum, CError * error);
-	double resultGetDouble(CResult * rawRes, short colNum, CError * error);
-	char * resultGetString(CResult * rawRes, short colNum, CError * error);
-	CTime * resultGetTime(CResult * rawRes, short colNum, CError * error);
-	CTimeStamp * resultGetTimeStamp(CResult * rawRes, short colNum, CError * error);
-	CDate * resultGetDate(CResult * rawRes, short colNum, CError * error);
-	bool resultGetBool(CResult * rawRes, short colNum, CError * error);
-	uint8_t * resultGetBinary(CResult * rawRes, short colNum, int * sizePointer, CError * error);
+	short resultGetShort(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	unsigned short resultGetUnsignedShort(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	int resultGetInt(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	int64_t resultGetBigInt(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	int32_t resultGetLong(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	float resultGetFloat(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	double resultGetDouble(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	CTime * resultGetTime(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	CTimeStamp * resultGetTimeStamp(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	CDate * resultGetDate(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	bool resultGetBool(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, int * sizePointer, CError * error);
 
 	// MARK: - Statement
 
