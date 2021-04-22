@@ -12,7 +12,7 @@ final class ODBCKitTests: XCTestCase {
 		// TODO: More general tests.
 
 		// let conn = try Connection(.odbcString("Driver={SQLite3};Database=test.db;"))
-		let conn = try Connection(.odbcString("Driver={PostgreSQL};Database=lebje;UID=lebje;Server=127.0.0.1;"))
+		let conn = try Connection(.odbcString("Driver={PostgreSQL ANSI};Database=lebje;UID=lebje;Server=172.17.0.1;"))
 		// var res = try conn
 		// .statement(query: "SELECT * FROM \"dataTypes\" WHERE \"time\" = ?;")
 		// .execute(with: [Time(hour: 7, minute: 52, second: 13)])
