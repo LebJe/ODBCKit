@@ -10,14 +10,13 @@ public class Statement {
 	let statementPointer: OpaquePointer
 
 	public init(connection: Connection, query: String, timeout: Int = 0) {
-		self.statementPointer = CNanODBC.stmtCreate(connection.connection, query, timeout)
+		self.statementPointer = stmtCreate(connection.connection, query, timeout)
 	}
 
-	public func execute(with values: [ODBCValue]) throws -> Result {
+	public func execute(with values: [BindableValue] = []) throws -> Result {
 		for i in 0..<values.count {
-			try values[i].bind(stmtPointer: self.statementPointer, index: i)
+			try values[i].bind(stmtPointer: self.statementPointer, index: Int16(i))
 		}
-		// try values.enumerated().forEach({ try $0.element.bind(stmtPointer: statementPointer, index: $0.offset) })
 
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		let resPointer = stmtExecute(statementPointer, errorPointer)

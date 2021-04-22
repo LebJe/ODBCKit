@@ -6,10 +6,16 @@
 
 import CNanODBC
 
-public struct Time {
+public struct Time: Equatable, Codable {
 	public let hour: Int
 	public let minute: Int
 	public let second: Int
+
+	public init(hour: Int, minute: Int, second: Int) {
+		self.hour = hour
+		self.minute = minute
+		self.second = second
+	}
 
 	init(cTime: CTime) {
 		self.hour = Int(cTime.hour)
@@ -22,10 +28,16 @@ public struct Time {
 	}
 }
 
-public struct Date {
+public struct Date: Equatable, Codable {
 	public let day: Int
 	public let month: Int
 	public let year: Int
+
+	public init(day: Int, month: Int, year: Int) {
+		self.day = day
+		self.month = month
+		self.year = year
+	}
 
 	init(cDate: CDate) {
 		self.year = Int(cDate.year)
@@ -38,12 +50,20 @@ public struct Date {
 	}
 }
 
-public struct TimeStamp {
+public struct TimeStamp: Equatable, Codable {
 	public let date: Date
 	public let hour: Int
 	public let minute: Int
 	public let second: Int
 	public let fractionalSecond: Int
+
+	public init(date: Date, hour: Int, minute: Int, second: Int, fractionalSecond: Int) {
+		self.date = date
+		self.hour = hour
+		self.minute = minute
+		self.second = second
+		self.fractionalSecond = fractionalSecond
+	}
 
 	init(cTimeStamp: CTimeStamp) {
 		self.date = Date(cDate: cTimeStamp.date)

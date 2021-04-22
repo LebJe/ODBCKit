@@ -8,6 +8,8 @@
 #include <CNanODBC/CNanODBC.h>
 #include <stdbool.h>
 #include <CNanODBC/CxxFuncs.h>
+#include <string.h>
+
 extern "C" {
 
 	// MARK: - Result Information
@@ -239,7 +241,7 @@ extern "C" {
 		}
 	}
 
-	char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
+	const char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error) {
 		try {
 			if (colNum != NULL) {
 				return strdup(reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::string>(*colNum).c_str());
@@ -270,9 +272,9 @@ extern "C" {
 
 			if (colNum != NULL) {
 				time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(*colNum);
+			} else {
+				time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(colName);
 			}
-
-			time = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::time>(colName);
 			CTime * cTime = (CTime *)malloc(sizeof(CTime));
 			*cTime = CTime { .hour = time.hour, .minute = time.min, .second = time.sec };
 			return cTime;
@@ -301,9 +303,9 @@ extern "C" {
 
 			if (colNum != NULL) {
 				timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(*colNum);
+			} else {
+				timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colName);
 			}
-
-			timestamp = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::timestamp>(colName);
 			CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
 
 			*cTimeStamp = CTimeStamp {
@@ -339,9 +341,9 @@ extern "C" {
 
 			if (colNum != NULL) {
 				date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(*colNum);
+			} else {
+				date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(colName);
 			}
-
-			date = reinterpret_cast<nanodbc::result *>(rawRes)->get<nanodbc::date>(colName);
 			return new CDate { .month = date.month, .day = date.day, .year = date.year };
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
@@ -371,30 +373,30 @@ extern "C" {
 		} catch (nanodbc::database_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = databaseError };
 			*error = cError;
-			return NULL;
+			return false;
 		} catch (nanodbc::index_range_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = indexOutOfRange };
 			*error = cError;
-			return NULL;
+			return false;
 		} catch (nanodbc::type_incompatible_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = invalidType };
 			*error = cError;
-			return NULL;
+			return false;
 		} catch (nanodbc::null_access_error& e) {
 			CError cError = CError { .message = strdup(e.what()), .reason = nullAccessError };
 			*error = cError;
-			return NULL;
+			return false;
 		}
 	}
 
 	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, int * sizePointer, CError * error) {
 		try {
-			std::vector<uint8_t> res;
+			auto res = std::vector<uint8_t>();
 			if (colNum != NULL) {
+				res = reinterpret_cast<nanodbc::result *>(rawRes)->get<std::vector<uint8_t>>(*colNum);
+			} else {
 				res = reinterpret_cast<nanodbc::result *>(rawRes)->get<std::vector<uint8_t>>(colName);
 			}
-
-			res = reinterpret_cast<nanodbc::result *>(rawRes)->get<std::vector<uint8_t>>(*colNum);
 
 			uint8_t * rawRes = (uint8_t *)malloc(sizeof(uint8_t) * res.size());
 

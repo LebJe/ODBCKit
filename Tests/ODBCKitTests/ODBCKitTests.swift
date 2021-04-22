@@ -9,21 +9,31 @@ import XCTest
 
 final class ODBCKitTests: XCTestCase {
 	func testExample() throws {
-		let conn = try Connection(.odbcString("Driver={PostgreSQL};Server=127.0.0.1;Database=lebje;Uid=lebje;"))
+		// TODO: More general tests.
 
-		let res = try conn
-			.statement(query: "SELECT \"float\" FROM \"dataTypes\" WHERE \"string\" = ?;")
-			.execute(with: ["string 1"])
+		// let conn = try Connection(.odbcString("Driver={SQLite3};Database=test.db;"))
+		let conn = try Connection(.odbcString("Driver={PostgreSQL};Database=lebje;UID=lebje;Server=127.0.0.1;"))
+		// var res = try conn
+		// .statement(query: "SELECT * FROM \"dataTypes\" WHERE \"time\" = ?;")
+		// .execute(with: [Time(hour: 7, minute: 52, second: 13)])
 
-		// print(try res.columns())
+		var res = try conn.execute(query: "SELECT * FROM \"dataTypes\";")
+
+		// print(try res.rows)
 
 		print("-------------------------")
+
 		while try res.next() {
-//			print("ID: \(try res.getInt(from: 0)!)")
-//			print("Name: \(try res.getString(from: 1)!)")
-//			print("EMail: \(try res.getString(from: 2)!)")
-//			print("Time: \(try res.getTimeStamp(from: 3)!)")
-			print(try res.getFloat(from: 0))
+			print("ID: \(try res["id"]!.int()!)")
+			print("String: \(try res["string"]!.string()!)")
+			print("Int: \(try res["int"]!.int()!)")
+			print("Float: \(try res["float"]!.float()!)")
+			print("Bool: \(try res["bool"]!.bool()!)")
+			print("Date: \(try res[5]!.date()!)")
+			print("Time: \(try res[6]!.time()!)")
+			print("TimeStamp: \(try res[7]!.timeStamp()!)")
+			print("Bytes: \(try res[8]!.bytes()!)")
+
 			print("-------------------------")
 		}
 	}

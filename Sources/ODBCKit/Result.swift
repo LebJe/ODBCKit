@@ -92,4 +92,19 @@ public struct Result {
 				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
 		}
 	}
+
+	subscript(index: Int) -> ResultValue? {
+		mutating get {
+			ResultValue(numOrName: .left(Int16(index)), resPointer: self.resPointer!)
+		}
+		set {}
+	}
+
+	subscript(name: String) -> ResultValue? {
+		mutating get {
+			ResultValue(numOrName: .right(name), resPointer: self.resPointer!)
+		}
+
+		set {}
+	}
 }

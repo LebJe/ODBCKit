@@ -8,6 +8,7 @@
 #include <CNanODBC/CNanODBC.h>
 #include <list>
 #include <stdlib.h>
+#include <string.h>
 
 extern "C" {
 	const CDriver * listDrivers(int * cDriverArraySize) {

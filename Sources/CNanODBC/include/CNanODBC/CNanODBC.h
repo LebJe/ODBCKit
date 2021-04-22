@@ -121,7 +121,7 @@ typedef enum ErrorReason ErrorReason;
 	int32_t resultGetLong(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	float resultGetFloat(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	double resultGetDouble(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error);
+	const char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	CTime * resultGetTime(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	CTimeStamp * resultGetTimeStamp(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	CDate * resultGetDate(CResult * rawRes, const short * colNum, const char * colName, CError * error);
@@ -131,8 +131,19 @@ typedef enum ErrorReason ErrorReason;
 	// MARK: - Statement
 
 	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout);
+	CError * stmtBindShort(CStatement * rawStmt, short paramIndex, short value);
+	CError * stmtBindUnsignedShort(CStatement * rawStmt, short paramIndex, unsigned short value);
 	CError * stmtBindInt(CStatement * rawStmt, short paramIndex, int value);
+	CError * stmtBindBigInt(CStatement * rawStmt, short paramIndex, int64_t value);
+	CError * stmtBindLong(CStatement * rawStmt, short paramIndex, int32_t value);
+	CError * stmtBindFloat(CStatement * rawStmt, short paramIndex, float value);
+	CError * stmtBindDouble(CStatement * rawStmt, short paramIndex, double value);
 	CError * stmtBindString(CStatement * rawStmt, short paramIndex, const char * value);
+	CError * stmtBindBool(CStatement * rawStmt, short paramIndex, bool value);
+	CError * stmtBindBinary(CStatement * rawStmt, short paramIndex, uint8_t * value, int64_t size);
+	CError * stmtBindTime(CStatement * rawStmt, short paramIndex, CTime value);
+	CError * stmtBindTimeStamp(CStatement * rawStmt, short paramIndex, CTimeStamp value);
+	CError * stmtBindDate(CStatement * rawStmt, short paramIndex, CDate value);
 	CResult * stmtExecute(CStatement * rawStmt, CError * error);
 	void stmtClose(CStatement * rawStmt);
 
