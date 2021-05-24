@@ -99,7 +99,7 @@ extension Bool: BindableValue {
 	}
 }
 
-extension Date: BindableValue {
+extension ODBCDate: BindableValue {
 	public var type: ODBCValueType { .date }
 
 	public func bind(stmtPointer: OpaquePointer, index: Int16) throws {
@@ -107,7 +107,7 @@ extension Date: BindableValue {
 	}
 }
 
-extension Time: BindableValue {
+extension ODBCTime: BindableValue {
 	public var type: ODBCValueType { .time }
 
 	public func bind(stmtPointer: OpaquePointer, index: Int16) throws {
@@ -115,7 +115,7 @@ extension Time: BindableValue {
 	}
 }
 
-extension TimeStamp: BindableValue {
+extension ODBCTimeStamp: BindableValue {
 	public var type: ODBCValueType { .timestamp }
 
 	public func bind(stmtPointer: OpaquePointer, index: Int16) throws {

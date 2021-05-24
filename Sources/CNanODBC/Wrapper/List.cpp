@@ -11,13 +11,13 @@
 #include <string.h>
 
 extern "C" {
-	const CDriver * listDrivers(int * cDriverArraySize) {
+	const CDriver * listDrivers(unsigned long * cDriverArraySize) {
 		auto drivers = nanodbc::list_drivers();
 
 		std::vector<nanodbc::driver> driverVector{ std::make_move_iterator(std::begin(drivers)),
 			std::make_move_iterator(std::end(drivers)) };
 
-		int size = driverVector.size();
+		unsigned long size = driverVector.size();
 
 		CDriver * driverArray = new CDriver[size];
 
@@ -29,7 +29,7 @@ extern "C" {
 			std::vector<nanodbc::driver::attribute> attrVector{ std::make_move_iterator(std::begin(d.attributes)),
 				std::make_move_iterator(std::end(d.attributes)) };
 
-			int attrSize = attrVector.size();
+			unsigned long attrSize = attrVector.size();
 
 			CAttribute * attrs = new CAttribute[attrSize];
 
@@ -48,13 +48,13 @@ extern "C" {
 		return driverArray;
 	}
 
-	const CDataSource * listDataSources(int * cDataSourceArraySize) {
+	const CDataSource * listDataSources(unsigned long * cDataSourceArraySize) {
 		auto dataSources = nanodbc::list_datasources();
 
 		std::vector<nanodbc::datasource> dataSourceVector{ std::make_move_iterator(std::begin(dataSources)),
 			std::make_move_iterator(std::end(dataSources)) };
 
-		int size = dataSourceVector.size();
+		unsigned long size = dataSourceVector.size();
 
 		CDataSource * dataSourceArray = new CDataSource[size];
 

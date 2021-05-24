@@ -6,7 +6,8 @@
 
 import CNanODBC
 
-public struct Time: Equatable, Codable {
+/// A representation of the time data type in a SQL database.
+public struct ODBCTime: Equatable, Codable {
 	public let hour: Int
 	public let minute: Int
 	public let second: Int
@@ -28,7 +29,8 @@ public struct Time: Equatable, Codable {
 	}
 }
 
-public struct Date: Equatable, Codable {
+/// A representation of the date data type in a SQL database.
+public struct ODBCDate: Equatable, Codable {
 	public let day: Int
 	public let month: Int
 	public let year: Int
@@ -50,14 +52,15 @@ public struct Date: Equatable, Codable {
 	}
 }
 
-public struct TimeStamp: Equatable, Codable {
-	public let date: Date
+/// A representation of the timestamp data type in a SQL database.
+public struct ODBCTimeStamp: Equatable, Codable {
+	public let date: ODBCDate
 	public let hour: Int
 	public let minute: Int
 	public let second: Int
 	public let fractionalSecond: Int
 
-	public init(date: Date, hour: Int, minute: Int, second: Int, fractionalSecond: Int) {
+	public init(date: ODBCDate, hour: Int, minute: Int, second: Int, fractionalSecond: Int) {
 		self.date = date
 		self.hour = hour
 		self.minute = minute
@@ -66,7 +69,7 @@ public struct TimeStamp: Equatable, Codable {
 	}
 
 	init(cTimeStamp: CTimeStamp) {
-		self.date = Date(cDate: cTimeStamp.date)
+		self.date = ODBCDate(cDate: cTimeStamp.date)
 		self.hour = Int(cTimeStamp.hour)
 		self.minute = Int(cTimeStamp.minute)
 		self.second = Int(cTimeStamp.second)

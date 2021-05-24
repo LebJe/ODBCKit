@@ -13,10 +13,6 @@
 extern "C" {
 
 	// MARK: - Result Information
-	long resultAffectedRows(CResult * rawRes) {
-		return reinterpret_cast<nanodbc::result *>(rawRes)->affected_rows();
-	}
-
 	long resultNumRows(CResult * rawRes) {
 		return reinterpret_cast<nanodbc::result *>(rawRes)->rows();
 	}
@@ -31,7 +27,7 @@ extern "C" {
 		}
 	}
 
-	bool resultHasAffectedRows(CResult * rawRes, CError * error) {
+	long resultAffectedRows(CResult * rawRes, CError * error) {
 		try {
 			return reinterpret_cast<nanodbc::result *>(rawRes)->affected_rows();
 		} catch (nanodbc::database_error& e) {
@@ -389,7 +385,7 @@ extern "C" {
 		}
 	}
 
-	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, int * sizePointer, CError * error) {
+	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, unsigned long * sizePointer, CError * error) {
 		try {
 			auto res = std::vector<uint8_t>();
 			if (colNum != NULL) {

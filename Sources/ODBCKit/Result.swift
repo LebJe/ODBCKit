@@ -9,21 +9,18 @@ import CNanODBC
 public struct Result {
 	let resPointer: OpaquePointer?
 
-	public var affectedRows: Int {
-		resultAffectedRows(self.resPointer)
-	}
-
-	public func hasAffectedRows() throws -> Bool {
+	public func hasAffectedRows() throws -> Int {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
-		let res = resultHasAffectedRows(self.resPointer, errorPointer)
+		let res = resultAffectedRows(self.resPointer, errorPointer)
 
 		if try self.handleError(errorPointer: errorPointer) {
 			return res
 		} else {
-			return false
+			return 0
 		}
 	}
 
+	/// The amount of columns in this `Result`.
 	public func columns() throws -> Int {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		let res = resultNumCols(self.resPointer, errorPointer)
@@ -35,6 +32,7 @@ public struct Result {
 		}
 	}
 
+	/// The amount of rows in this `Result`.
 	public var rows: Int {
 		resultNumRows(self.resPointer)
 	}
@@ -76,17 +74,17 @@ public struct Result {
 		}
 
 		switch errorPointer.pointee.reason {
-			case general:
+			case ErrorReason.general:
 				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
-			case nullAccessError:
+			case ErrorReason.nullAccessError:
 				return false
-			case invalidType:
+			case ErrorReason.invalidType:
 				throw ODBCError.invalidType
-			case indexOutOfRange:
+			case ErrorReason.indexOutOfRange:
 				throw ODBCError.indexOutOfRange
-			case programmingError:
+			case ErrorReason.programmingError:
 				throw ODBCError.programmingError(message: String(cString: errorPointer.pointee.message))
-			case databaseError:
+			case ErrorReason.databaseError:
 				throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
 			default:
 				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
@@ -97,14 +95,11 @@ public struct Result {
 		mutating get {
 			ResultValue(numOrName: .left(Int16(index)), resPointer: self.resPointer!)
 		}
-		set {}
 	}
 
 	subscript(name: String) -> ResultValue? {
 		mutating get {
 			ResultValue(numOrName: .right(name), resPointer: self.resPointer!)
 		}
-
-		set {}
 	}
 }

@@ -17,17 +17,17 @@ public struct ResultValue {
 		}
 
 		switch errorPointer.pointee.reason {
-			case general:
+			case ErrorReason.general:
 				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
-			case nullAccessError:
+			case ErrorReason.nullAccessError:
 				return false
-			case invalidType:
+			case ErrorReason.invalidType:
 				throw ODBCError.invalidType
-			case indexOutOfRange:
+			case ErrorReason.indexOutOfRange:
 				throw ODBCError.indexOutOfRange
-			case programmingError:
+			case ErrorReason.programmingError:
 				throw ODBCError.programmingError(message: String(cString: errorPointer.pointee.message))
-			case databaseError:
+			case ErrorReason.databaseError:
 				throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
 			default:
 				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
@@ -226,7 +226,7 @@ public struct ResultValue {
 	/// Retrieves a `Time` from this `ResultValue`.
 	/// - Throws: `ODBCError`.
 	/// - Returns: The requested `Time`.
-	func time() throws -> Time? {
+	func time() throws -> ODBCTime? {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		var res: UnsafeMutablePointer<CTime>?
 
@@ -238,7 +238,7 @@ public struct ResultValue {
 		}
 
 		if try self.handleError(errorPointer: errorPointer) && res != nil {
-			return Time(cTime: res!.pointee)
+			return ODBCTime(cTime: res!.pointee)
 		} else {
 			return nil
 		}
@@ -247,7 +247,7 @@ public struct ResultValue {
 	/// Retrieves a `TimeStamp` from this `ResultValue`.
 	/// - Throws: `ODBCError`.
 	/// - Returns: The requested `TimeStamp`.
-	func timeStamp() throws -> TimeStamp? {
+	func timeStamp() throws -> ODBCTimeStamp? {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		var res: UnsafeMutablePointer<CTimeStamp>?
 
@@ -259,7 +259,7 @@ public struct ResultValue {
 		}
 
 		if try self.handleError(errorPointer: errorPointer) && res != nil {
-			return TimeStamp(cTimeStamp: res!.pointee)
+			return ODBCTimeStamp(cTimeStamp: res!.pointee)
 		} else {
 			return nil
 		}
@@ -268,7 +268,7 @@ public struct ResultValue {
 	/// Retrieves a `Date` from this `ResultValue`.
 	/// - Throws: `ODBCError`.
 	/// - Returns: The requested `Date`.
-	func date() throws -> Date? {
+	func date() throws -> ODBCDate? {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		var res: UnsafeMutablePointer<CDate>?
 
@@ -280,7 +280,7 @@ public struct ResultValue {
 		}
 
 		if try self.handleError(errorPointer: errorPointer) && res != nil {
-			return Date(cDate: res!.pointee)
+			return ODBCDate(cDate: res!.pointee)
 		} else {
 			return nil
 		}
@@ -293,7 +293,7 @@ public struct ResultValue {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		var res: UnsafeMutablePointer<UInt8>?
 		var data: [UInt8] = []
-		var size: Int32 = 0
+		var size: UInt = 0
 
 		switch self.numOrName {
 			case var .left(index):

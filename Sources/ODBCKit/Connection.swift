@@ -6,15 +6,51 @@
 
 import CNanODBC
 
+/// How the driver and database details will be passed to the ODBC driver.
 public enum ConnectionType {
+	/// Connect using an ODBC string,
+	///
+	/// Example:
+	/// ```
+	/// Driver={PostgreSQL};Database=postgres;UID=postgres;Server=localhost;Port=5432;
+	/// ```
 	case odbcString(String)
+
+	/// Connect using a ODBC DSN (Data Source Name).
+	///
+	/// Example
+	///
+	/// `~/.odbc.ini`:
+	/// ```ini
+	/// [PostgreSQLDSN]
+	/// Driver = PostgreSQL
+	/// Server = localhost
+	/// Database = postgres
+	/// ```
+	/// Swift code:
+	///
+	/// ```swift
+	/// Connection(
+	/// 	.dataSource(
+	/// 		dsn: "PostgreSQLDSN",
+	/// 		username: "postgres",
+	/// 		password: "postgres"
+	/// 	)
+	/// )
+	/// ```
 	case dataSource(dsn: String, username: String, password: String)
 }
 
+/// An ODBC connection.
 public class Connection {
 	public let connectionType: ConnectionType
 	internal let connection: OpaquePointer
 
+	/// Create a new connection.
+	/// - Parameters:
+	///   - connectionType: The `ConnectionType` that describes how the driver and database details will be passed to the ODBC driver.
+	///   - timeout: The amount of seconds to wait when trying to establish a connection.
+	/// - Throws: `ODBCError.databaseError` or `ODBCError.general`.
 	public init(_ connectionType: ConnectionType, timeout: Int = 0) throws {
 		self.connectionType = connectionType
 		switch connectionType {
@@ -25,7 +61,7 @@ public class Connection {
 					self.connection = c
 				} else {
 					switch errorPointer.pointee.reason {
-						case databaseError:
+						case ErrorReason.databaseError:
 							throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
 						default:
 							throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
@@ -39,7 +75,7 @@ public class Connection {
 					self.connection = c
 				} else {
 					switch errorPointer.pointee.reason {
-						case databaseError:
+						case ErrorReason.databaseError:
 							throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
 						default:
 							throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
@@ -50,10 +86,18 @@ public class Connection {
 
 	// deinit { destroyConnection(connection) }
 
+	/// Create a new `Statement`.
+	/// - Parameter query: The SQL query to pass to the `Statement`.
+	/// - Returns: `Statement`.
 	public func statement(query: String) -> Statement {
 		.init(connection: self, query: query)
 	}
 
+	/// Execute `query` on the database, without returning the results of the query..
+	/// - Parameters:
+	///   - query: The SQL query to execute.
+	///   - timeout: The amount of seconds to wait for the query to execute.
+	/// - Throws: `ODBCError`.
 	public func justExecute(query: String, timeout: Int = 0) throws {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 
@@ -64,6 +108,12 @@ public class Connection {
 		}
 	}
 
+	/// Execute `query` on the database.
+	/// - Parameters:
+	///   - query: The SQL query to execute.
+	///   - timeout: The amount of seconds to wait for the query to execute.
+	/// - Throws: `ODBCError`.
+	/// - Returns: `Result`.
 	public func execute(query: String, timeout: Int = 0) throws -> Result {
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
 		let resPointer = cExecute(connection, query, 1, timeout, errorPointer)

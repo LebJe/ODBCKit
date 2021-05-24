@@ -7,12 +7,26 @@
 @testable import ODBCKit
 import XCTest
 
-final class ODBCKitTests: XCTestCase {
+final class SQLiteTests: XCTestCase {
+	override class func setUp() {
+		// Remove old database.
+		do {
+			try FileManager.default.removeItem(at: URL(fileURLWithPath: "test.db"))
+		} catch {
+			XCTFail("Unable to delete test.db")
+		}
+		FileManager.default.createFile(atPath: "test.db", contents: nil, attributes: nil)
+
+		do {
+			let conn = try Connection(.odbcString("Driver={SQLite3};Database=test.db;"))
+
+		} catch {}
+	}
+
 	func testExample() throws {
 		// TODO: More general tests.
 
-		// let conn = try Connection(.odbcString("Driver={SQLite3};Database=test.db;"))
-		let conn = try Connection(.odbcString("Driver={PostgreSQL ANSI};Database=lebje;UID=lebje;Server=172.17.0.1;"))
+		let conn = try Connection(.odbcString("Driver={SQLite3};Database=test.db;"))
 		// var res = try conn
 		// .statement(query: "SELECT * FROM \"dataTypes\" WHERE \"time\" = ?;")
 		// .execute(with: [Time(hour: 7, minute: 52, second: 13)])

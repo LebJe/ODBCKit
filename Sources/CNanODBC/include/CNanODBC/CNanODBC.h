@@ -44,7 +44,7 @@ extern "C" {
 
 	struct CDriver {
 		const char * name;
-		const int * attrSize;
+		const unsigned long * attrSize;
 		const CAttribute * attributes;
 	};
 
@@ -57,7 +57,7 @@ enum ErrorReason {
 	indexOutOfRange,
 	programmingError,
 	databaseError
-};
+} __attribute__((enum_extensibility(open)));
 
 typedef enum ErrorReason ErrorReason;
 
@@ -100,18 +100,17 @@ typedef enum ErrorReason ErrorReason;
 	void destroyConnection(CConnection * conn);
 
 	// MARK: - List
-	const CDriver * listDrivers(int * cDriverArraySize);
-	const CDataSource * listDataSources(int * cDataSourceArraySize);
+	const CDriver * listDrivers(unsigned long * cDriverArraySize);
+	const CDataSource * listDataSources(unsigned long * cDataSourceArraySize);
 
 	// MARK: - Execute
 	void justExecute(CConnection * rawConn, const char * query, long batchOperations, long timeout, CError * error);
 	CResult * cExecute(CConnection * rawConn, const char * query, long batchOperations, long timeout, CError * error);
 
 	// MARK: - Result
-	long resultAffectedRows(CResult * rawRes);
 	long resultNumRows(CResult * rawRes);
 	short resultNumCols(CResult * rawRes, CError * error);
-	bool resultHasAffectedRows(CResult * rawRes, CError * error);
+	long resultAffectedRows(CResult * rawRes, CError * error);
 	bool resultNext(CResult * rawRes, CError * error);
 	bool resultPrior(CResult * rawRes, CError * error);
 	short resultGetShort(CResult * rawRes, const short * colNum, const char * colName, CError * error);
@@ -126,7 +125,7 @@ typedef enum ErrorReason ErrorReason;
 	CTimeStamp * resultGetTimeStamp(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	CDate * resultGetDate(CResult * rawRes, const short * colNum, const char * colName, CError * error);
 	bool resultGetBool(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, int * sizePointer, CError * error);
+	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, unsigned long * sizePointer, CError * error);
 
 	// MARK: - Statement
 

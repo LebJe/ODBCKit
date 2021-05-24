@@ -5,6 +5,7 @@
 //  The full text of the license can be found in the file named LICENSE.
 
 public enum ODBCError: Error {
+	/// A general error occurred.
 	case general(message: String? = nil)
 
 	/// The type you requested is not the type of the value in the specified column.
@@ -14,5 +15,6 @@ public enum ODBCError: Error {
 
 	case programmingError(message: String)
 
+	/// An error occurred in the database.
 	case databaseError(message: String)
 }

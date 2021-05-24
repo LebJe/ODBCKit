@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.4
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -25,7 +25,7 @@ let package = Package(
 			cxxSettings: [
 				.define("NANODBC_DISABLE_TESTS", to: "ON"),
 				.define("NANODBC_DISABLE_EXAMPLES", to: "ON"),
-				.define("NANODBC_THROW_NO_SOURCE_LOCATION", to: "ON", .when(platforms: nil, configuration: .release)),
+				.define("NANODBC_THROW_NO_SOURCE_LOCATION", to: "ON", .when(configuration: .release)),
 				// .define("NANODBC_ENABLE_UNICODE", to: "ON"),
 			],
 			linkerSettings: [.linkedLibrary("odbc")]

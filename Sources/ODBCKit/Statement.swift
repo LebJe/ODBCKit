@@ -13,6 +13,10 @@ public class Statement {
 		self.statementPointer = stmtCreate(connection.connection, query, timeout)
 	}
 
+	/// Executes this `Statement` and returns the `Result` of execution.
+	/// - Parameter values: The values to bind to the parameters in your query.
+	/// - Throws: `ODBCError`.
+	/// - Returns: `Result`.
 	public func execute(with values: [BindableValue] = []) throws -> Result {
 		for i in 0..<values.count {
 			try values[i].bind(stmtPointer: self.statementPointer, index: Int16(i))
@@ -23,7 +27,7 @@ public class Statement {
 
 		if errorPointer.pointee.message != nil {
 			switch errorPointer.pointee.reason {
-				case databaseError: throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
+				case ErrorReason.databaseError: throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
 				default: throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
 			}
 		}

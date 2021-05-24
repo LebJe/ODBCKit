@@ -23,8 +23,9 @@ public struct DataSource {
 		self = DataSource(name: String(cString: cDataSource.name), driver: String(cString: cDataSource.driver))
 	}
 
+	/// Retrieve a list of all datasources.
 	public static func all() -> [DataSource] {
-		var size: Int32 = 0
+		var size: UInt = 0
 		var dataSourceArray: [DataSource] = []
 		let dataSources = listDataSources(&size)
 

@@ -51,7 +51,7 @@ public struct Driver {
 
 	/// Retrieve a list of all the installed `Driver`s.
 	public static func all() -> [Driver] {
-		var size: Int32 = 0
+		var size: UInt = 0
 		var driverArray: [Driver] = []
 		let drivers = listDrivers(&size)
 
