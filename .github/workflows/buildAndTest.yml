@@ -6,5 +6,23 @@ jobs:
     runs-on: "macos-10.15"
     steps:
     - uses: "actions/checkout@v2"
-    - name: "Run tests"
-      run: "swift test"
+    - name: "Install Dependencies"
+      run: |
+        # Install dependencies
+        brew update && brew upgrade
+        brew install sqlite unixodbc sqliteodbc psqlodbc
+
+        # Setup dependencies
+        # Based on https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_script.sqlite.sh
+        # and https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_install.osx.sh
+        cat > "$(odbc_config --odbcinstini)" <<EOF
+        [PostgreSQL]
+        Description = PostgreSQL ODBC Driver
+        Driver = $(brew ls psqlodbc -v | grep psqlodbcw.so)
+        [SQLite3]
+        Description = SQLite3 ODBC Driver
+        Driver = $(brew ls -v sqliteodbc | grep libsqlite3odbc.dylib)
+        EOF
+    - name: "Run Tests"
+      run: |
+        swift test -Xlinker "$(pkg-config --libs-only-L odbc)"

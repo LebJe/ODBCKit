@@ -93,7 +93,7 @@ public class Connection {
 		.init(connection: self, query: query)
 	}
 
-	/// Execute `query` on the database, without returning the results of the query..
+	/// Execute `query` on the database, without returning the results of the query.
 	/// - Parameters:
 	///   - query: The SQL query to execute.
 	///   - timeout: The amount of seconds to wait for the query to execute.

@@ -6,3 +6,4 @@ xcuserdata/
 /.swiftpm
 Package.resolved
 Brewfile.lock.json
+*.db
