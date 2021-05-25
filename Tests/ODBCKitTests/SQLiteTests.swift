@@ -32,7 +32,9 @@ final class SQLiteTests: XCTestCase {
 	override class func setUp() {
 		// Remove old database.
 		do {
-			try FileManager.default.removeItem(at: URL(fileURLWithPath: Self.dbName))
+			if FileManager.default.fileExists(atPath: Self.dbName) {
+				try FileManager.default.removeItem(at: URL(fileURLWithPath: Self.dbName))
+			}
 		} catch {
 			XCTFail("Unable to delete \(Self.dbName)")
 		}
