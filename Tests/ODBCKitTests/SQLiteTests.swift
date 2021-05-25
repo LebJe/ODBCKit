@@ -8,7 +8,7 @@
 import XCTest
 
 final class SQLiteTests: XCTestCase {
-	static var dbName = "test2.db"
+	static var dbName = "test.db"
 	static var connString = "Driver={SQLite3};Database=test.db;"
 
 	static var dbSetupStmt = """
