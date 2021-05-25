@@ -1,5 +1,6 @@
 module CNanoODBC {
 	link "odbc"
 	header "CNanoODBC.h"
+	exclude header "CxxFuncs.h"
 	export *
 }

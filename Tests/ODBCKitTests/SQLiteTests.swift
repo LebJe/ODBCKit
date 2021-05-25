@@ -41,6 +41,7 @@ final class SQLiteTests: XCTestCase {
 		FileManager.default.createFile(atPath: Self.dbName, contents: nil, attributes: nil)
 
 		do {
+			print("Creating Db")
 			let conn = try Connection(.odbcString(Self.connString))
 
 			try conn.justExecute(query: Self.dbSetupStmt)
@@ -48,11 +49,19 @@ final class SQLiteTests: XCTestCase {
 	}
 
 	func testSmallTest() throws {
+		print("Connecting...")
 		let conn = try Connection(.odbcString(Self.connString))
 
+		print("Connected")
+
+		print("Executing query")
 		var res = try conn.execute(query: "SELECT * FROM \"testable1\";")
 
+		print("res.next")
+
 		XCTAssertTrue(try res.next())
+
+		print("Extracting Values")
 
 		print("ID: \(try res["id"]!.int()!)")
 		print("String: \(try res["string"]!.string()!)")
