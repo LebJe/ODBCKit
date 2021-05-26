@@ -28,7 +28,7 @@ jobs:
             sleep 10
         done
 
-        psql --command="CREATE USER postgres PASSWORD 'postgres';" $USERNAME
+        psql --command="CREATE USER postgres PASSWORD 'postgres';"
 
         createdb --owner=postgres testdb
         PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
