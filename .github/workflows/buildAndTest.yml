@@ -11,8 +11,28 @@ jobs:
         brew update
         brew install sqlite unixodbc sqliteodbc psqlodbc
 
+        brew services start postgresql
+
+        echo "Check PostgreSQL service is running"
+        i=10
+        COMMAND='pg_isready'
+        while [ $i -gt 0 ]; do
+            echo "Check PostgreSQL service status"
+            eval $COMMAND && break
+            ((i--))
+            if [ $i == 0 ]; then
+                echo "PostgreSQL service not ready, all attempts exhausted"
+                exit 1
+            fi
+            echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
+            sleep 10
+        done
+
+        psql --command="ALTER ROLE postgres WITH PASSWORD 'postgres';" postgres
+
         # Based on https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_script.sqlite.sh
         # and https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_install.osx.sh
+
         cat > "$(odbc_config --odbcinstini)" <<EOF
         [PostgreSQL]
         Description = PostgreSQL ODBC Driver

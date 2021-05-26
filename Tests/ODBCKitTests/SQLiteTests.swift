@@ -13,12 +13,13 @@ final class SQLiteTests: XCTestCase {
 
 	static var dbSetupStmt = """
 	DROP TABLE IF EXISTS "testTable1";
+
 	CREATE TABLE "testTable1" (
 		"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-		"string" VARCHAR(255) NOT NULL DEFAULT 'string 1',
-		"int" INTEGER NOT NULL DEFAULT 100,
-		"double" REAL NOT NULL DEFAULT 100.5,
-		"bool" INTEGER NOT NULL DEFAULT false,
+		"string" VARCHAR(255) NOT NULL,
+		"int" INTEGER NOT NULL,
+		"double" REAL NOT NULL,
+		"bool" INTEGER NOT NULL,
 		"date" TEXT NOT NULL DEFAULT CURRENT_DATE,
 		"time" TEXT NOT NULL DEFAULT CURRENT_TIME,
 		"timestamp" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -41,7 +42,7 @@ final class SQLiteTests: XCTestCase {
 		FileManager.default.createFile(atPath: Self.dbName, contents: nil, attributes: nil)
 
 		do {
-			print("Creating Db")
+			print("Creating DB")
 			let conn = try Connection(.odbcString(Self.connString))
 
 			try conn.justExecute(query: Self.dbSetupStmt)
