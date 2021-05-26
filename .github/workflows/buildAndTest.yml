@@ -24,4 +24,4 @@ jobs:
     - name: "Run Tests"
       run: |
         sudo xcode-select -s /Applications/Xcode_12.5.app
-        swift test -Xlinker "$(pkg-config --libs-only-L odbc)" -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx11.3"
+        swift test --disable-sandbox -Xlinker "$(pkg-config --libs-only-L odbc)" -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx11.3"
