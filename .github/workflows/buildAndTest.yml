@@ -28,7 +28,10 @@ jobs:
             sleep 10
         done
 
-        psql --command="ALTER ROLE postgres WITH PASSWORD 'postgres';" postgres
+        psql --command="CREATE USER postgres PASSWORD 'postgres';" $USERNAME
+
+        createdb --owner=postgres testdb
+        PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
 
         # Based on https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_script.sqlite.sh
         # and https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_install.osx.sh
