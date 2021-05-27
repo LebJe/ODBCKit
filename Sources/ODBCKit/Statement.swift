@@ -17,9 +17,13 @@ public class Statement {
 	/// - Parameter values: The values to bind to the parameters in your query.
 	/// - Throws: `ODBCError`.
 	/// - Returns: `Result`.
-	public func execute(with values: [BindableValue] = []) throws -> Result {
+	public func execute(with values: [BindableValue?] = []) throws -> Result {
 		for i in 0..<values.count {
-			try values[i].bind(stmtPointer: self.statementPointer, index: Int16(i))
+			if values[i] == nil {
+				stmtBindNull(self.statementPointer, Int16(i))
+			} else {
+				try values[i]!.bind(stmtPointer: self.statementPointer, index: Int16(i))
+			}
 		}
 
 		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)

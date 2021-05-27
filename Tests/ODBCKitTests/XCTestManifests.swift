@@ -9,7 +9,8 @@ import XCTest
 #if !canImport(ObjectiveC)
 	public func allTests() -> [XCTestCaseEntry] {
 		[
-			testCase(ODBCKitTests.allTests),
+			testCase(PostgreSQLTests.allTests),
+			testCase(SQLIiteTests.allTests),
 		]
 	}
 #endif

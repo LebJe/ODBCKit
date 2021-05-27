@@ -130,6 +130,7 @@ typedef enum ErrorReason ErrorReason;
 	// MARK: - Statement
 
 	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout);
+	CError * stmtBindNull(CStatement * rawStmt, short paramIndex);
 	CError * stmtBindShort(CStatement * rawStmt, short paramIndex, short value);
 	CError * stmtBindUnsignedShort(CStatement * rawStmt, short paramIndex, unsigned short value);
 	CError * stmtBindInt(CStatement * rawStmt, short paramIndex, int value);

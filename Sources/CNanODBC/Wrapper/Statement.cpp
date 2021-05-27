@@ -17,6 +17,17 @@ extern "C" {
 
 	// MARK: - Bind
 
+	CError * stmtBindNull(CStatement * rawStmt, short paramIndex) {
+		try {
+			reinterpret_cast<nanodbc::statement *>(rawStmt)->bind_null(paramIndex);
+		} catch (nanodbc::database_error& e) {
+			return new CError { .message = strdup(e.what()), .reason = databaseError };
+			return NULL;
+		}
+
+		return NULL;
+	}
+
 	CError * stmtBindShort(CStatement * rawStmt, short paramIndex, short value) {
 		try {
 			reinterpret_cast<nanodbc::statement *>(rawStmt)->bind(paramIndex, &value);
