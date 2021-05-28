@@ -31,48 +31,48 @@ final class SQLiteTests: XCTestCase {
 	"""
 
 	override class func setUp() {
-		// Remove old database.
-		do {
-			if FileManager.default.fileExists(atPath: Self.dbName) {
-				try FileManager.default.removeItem(at: URL(fileURLWithPath: Self.dbName))
-			}
-		} catch {
-			XCTFail("Unable to delete \(Self.dbName)")
-		}
-		FileManager.default.createFile(atPath: Self.dbName, contents: nil, attributes: nil)
-
-		do {
-			print("Creating DB")
-			let conn = try Connection(.odbcString(Self.connString))
-
-			try conn.justExecute(query: Self.dbSetupStmt)
-		} catch {}
+//		// Remove old database.
+//		do {
+//			if FileManager.default.fileExists(atPath: Self.dbName) {
+//				try FileManager.default.removeItem(at: URL(fileURLWithPath: Self.dbName))
+//			}
+//		} catch {
+//			XCTFail("Unable to delete \(Self.dbName)")
+//		}
+//		FileManager.default.createFile(atPath: Self.dbName, contents: nil, attributes: nil)
+//
+//		do {
+//			print("Creating DB")
+//			let conn = try Connection(.odbcString(Self.connString))
+//
+//			try conn.justExecute(query: Self.dbSetupStmt)
+//		} catch {}
 	}
 
 	func testSmallTest() throws {
-		print("Connecting...")
-		let conn = try Connection(.odbcString(Self.connString))
-
-		print("Connected")
-
-		print("Executing query")
-		var res = try conn.execute(query: "SELECT * FROM \"testable1\";")
-
-		print("res.next")
-
-		XCTAssertTrue(try res.next())
-
-		print("Extracting Values")
-
-		print("ID: \(try res["id"]!.int()!)")
-		print("String: \(try res["string"]!.string()!)")
-		print("Int: \(try res["int"]!.int()!)")
-		print("Float: \(try res["float"]!.float()!)")
-		print("Bool: \(try res["bool"]!.bool()!)")
-		print("Date: \(try res[5]!.date()!)")
-		print("Time: \(try res[6]!.time()!)")
-		print("TimeStamp: \(try res[7]!.timeStamp()!)")
-		print("Bytes: \(try res[8]!.bytes()!)")
+//		print("Connecting...")
+//		let conn = try Connection(.odbcString(Self.connString))
+//
+//		print("Connected")
+//
+//		print("Executing query")
+//		var res = try conn.execute(query: "SELECT * FROM \"testable1\";")
+//
+//		print("res.next")
+//
+//		XCTAssertTrue(try res.next())
+//
+//		print("Extracting Values")
+//
+//		print("ID: \(try res["id"]!.int()!)")
+//		print("String: \(try res["string"]!.string()!)")
+//		print("Int: \(try res["int"]!.int()!)")
+//		print("Float: \(try res["float"]!.float()!)")
+//		print("Bool: \(try res["bool"]!.bool()!)")
+//		print("Date: \(try res[5]!.date()!)")
+//		print("Time: \(try res[6]!.time()!)")
+//		print("TimeStamp: \(try res[7]!.timeStamp()!)")
+//		print("Bytes: \(try res[8]!.bytes()!)")
 	}
 
 	static var allTests = [
