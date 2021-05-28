@@ -11,6 +11,8 @@ jobs:
         brew update
         brew install sqlite unixodbc sqliteodbc psqlodbc
 
+        brew info postgresql
+
         brew services start postgresql
 
         echo "Check PostgreSQL service is running"
@@ -28,10 +30,10 @@ jobs:
             sleep 10
         done
 
-        psql --command="CREATE USER postgres PASSWORD 'postgres';"
+        psql --command="\du;"
 
-        createdb --owner=postgres testdb
-        PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
+        #createdb --owner=postgres testdb
+        #PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
 
         # Based on https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_script.sqlite.sh
         # and https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_install.osx.sh
