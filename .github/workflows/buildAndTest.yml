@@ -68,5 +68,5 @@ jobs:
         run: |
           clang --version
           clang++ --version
-          swift build -v
+          #swift build Xcc -stdlib=libc++ -v
           swift test -Xcc -stdlib=libc++ -v
