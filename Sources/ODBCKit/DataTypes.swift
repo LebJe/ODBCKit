@@ -48,7 +48,7 @@ public struct ODBCDate: Equatable, Codable {
 	}
 
 	var cDate: CDate {
-		CDate(year: Int16(self.year), month: Int16(self.month), day: Int16(self.day))
+		CDate(month: Int16(self.year), day: Int16(self.month), year: Int16(self.day))
 	}
 }
 

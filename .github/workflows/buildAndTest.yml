@@ -65,8 +65,4 @@ jobs:
           sudo odbcinst -i -d -f /usr/share/sqliteodbc/unixodbc.ini
           sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
       - name: "Run Tests"
-        run: |
-          clang --version
-          clang++ --version
-          #swift build Xcc -stdlib=libc++ -v
-          swift test -Xcc -stdlib=libc++ -v
+        run: "swift test -Xcc -stdlib=libc++"
