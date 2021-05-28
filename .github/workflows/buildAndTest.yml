@@ -61,6 +61,10 @@ jobs:
 
           sudo systemctl start postgresql.service
           pg_isready
+
+          sudo odbcinst -i -d -f /usr/share/sqliteodbc/unixodbc.ini
+          sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
       - name: "Run Tests"
         run: |
-          swift test
+          clang --version
+          swift test -v
