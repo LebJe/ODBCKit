@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <CNanODBC/CxxFuncs.h>
 #include <string.h>
+#include <stdlib.h>
 
 extern "C" {
 
@@ -305,11 +306,11 @@ extern "C" {
 			CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
 
 			*cTimeStamp = CTimeStamp {
+				.date = CDate { .year = timestamp.year, .month = timestamp.month, .day = timestamp.day },
 				.hour = timestamp.hour,
 				.minute = timestamp.min,
 				.second = timestamp.sec,
-				.fractionalSec = timestamp.fract,
-				.date = CDate { .year = timestamp.year, .month = timestamp.month, .day = timestamp.day }
+				.fractionalSec = timestamp.fract
 			};
 			return cTimeStamp;
 		} catch (nanodbc::database_error& e) {

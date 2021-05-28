@@ -69,9 +69,9 @@ typedef enum ErrorReason ErrorReason;
 	typedef struct CError CError;
 
 	struct CDate {
-		int16_t year;
 		int16_t month;
 		int16_t day;
+		int16_t year;
 	};
 
 	typedef struct CDate CDate;
