@@ -11,7 +11,7 @@ jobs:
         brew update
         brew install sqlite unixodbc sqliteodbc psqlodbc
 
-        brew info postgresql
+        brew info postgres
 
         brew services start postgresql
 
