@@ -69,4 +69,4 @@ jobs:
           clang --version
           clang++ --version
           swift build -v
-          swift test -v
+          swift test -Xcc -stdlib=libc++ -v
