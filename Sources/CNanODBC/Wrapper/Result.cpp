@@ -306,7 +306,7 @@ extern "C" {
 			CTimeStamp * cTimeStamp = (CTimeStamp *)malloc(sizeof(CTimeStamp));
 
 			*cTimeStamp = CTimeStamp {
-				.date = CDate { .year = timestamp.year, .month = timestamp.month, .day = timestamp.day },
+				.date = CDate { .month = timestamp.month, .day = timestamp.day, .year = timestamp.year },
 				.hour = timestamp.hour,
 				.minute = timestamp.min,
 				.second = timestamp.sec,
