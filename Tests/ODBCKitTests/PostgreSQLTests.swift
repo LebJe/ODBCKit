@@ -35,7 +35,11 @@ final class PostgreSQLTests: XCTestCase {
 
 	"""
 
-	static var connString = ConnectionType.odbcString("Driver={PostgreSQL};Database=postgres;UID=postgres;Server=localhost;")
+	#if os(macOS)
+		static var connString = ConnectionType.odbcString("Driver={PostgreSQL};Database=postgres;UID=postgres;Server=localhost;")
+	#elseif os(Linux)
+		static var connString = ConnectionType.odbcString("Driver={PostgreSQL ANSI};Database=postgres;UID=postgres;Server=localhost;")
+	#endif
 
 	override class func setUp() {
 		do {
