@@ -66,5 +66,4 @@ jobs:
           sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
       - name: "Run Tests"
         run: |
-          swift build -Xcxx -stdlib=libc++ -Xlinker "$(pkg-config --libs-only-L odbc)"
-          swift test -Xcxx -stdlib=libc++ -Xlinker "$(pkg-config --libs-only-L odbc)"
+          swift test -Xcxx -stdlib=libc++ -Xcxx -lc++abi -Xcxx -lc++ -Xlinker "$(pkg-config --libs-only-L odbc)"
