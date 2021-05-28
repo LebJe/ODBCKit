@@ -30,7 +30,7 @@ jobs:
             sleep 10
         done
 
-        psql --command="\du;" -U $(echo $USER)
+        #psql --command="\du;" -U $(echo $USER)
 
         #createdb --owner=postgres testdb
         #PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
