@@ -10,7 +10,7 @@ import XCTest
 	public func allTests() -> [XCTestCaseEntry] {
 		[
 			testCase(PostgreSQLTests.allTests),
-			testCase(SQLIiteTests.allTests),
+			testCase(SQLiteTests.allTests),
 		]
 	}
 #endif

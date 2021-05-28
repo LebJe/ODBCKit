@@ -23,12 +23,12 @@ let package = Package(
 			name: "CNanODBC",
 			path: "Sources/CNanODBC",
 			cxxSettings: [
-				.define("NANODBC_DISABLE_TESTS", to: "ON"),
-				.define("NANODBC_DISABLE_EXAMPLES", to: "ON"),
 				.define("NANODBC_THROW_NO_SOURCE_LOCATION", to: "ON", .when(configuration: .release)),
 				// .define("NANODBC_ENABLE_UNICODE", to: "ON"),
 			],
-			linkerSettings: [.linkedLibrary("odbc")]
+			linkerSettings: [
+				.linkedLibrary("odbc"),
+			]
 		),
 		.target(
 			name: "ODBCKit",

@@ -67,4 +67,6 @@ jobs:
       - name: "Run Tests"
         run: |
           clang --version
+          clang++ --version
+          swift build -v
           swift test -v
