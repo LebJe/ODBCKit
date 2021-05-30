@@ -66,4 +66,5 @@ jobs:
           sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
       - name: "Run Tests"
         run: |
+        cat /etc/odbcinst.ini
           swift test -Xcxx -stdlib=libc++ -Xlinker -lc++abi -Xlinker -lc++
