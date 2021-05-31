@@ -24,6 +24,8 @@ public enum ODBCValueType {
 
 public protocol BindableValue {
 	var type: ODBCValueType { get }
+
+	/// Bind this value to the `Statement` pointer at index `index`.
 	func bind(stmtPointer: OpaquePointer, index: Int16) throws
 }
 
