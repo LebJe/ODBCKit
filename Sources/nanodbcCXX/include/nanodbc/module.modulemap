@@ -1,4 +1,5 @@
 module nanodbcCXX {
 	header "nanodbc1.h"
+	link "odbc"
 	requires cplusplus
 }

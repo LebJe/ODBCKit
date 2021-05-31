@@ -1,13 +1,13 @@
 // swift-tools-version:5.3
 
-import PackageDescription
 import Foundation
+import PackageDescription
 
 let package = Package(
-    name: "ODBCKit",
-    dependencies: [],
-    targets: [
-        .target(
+	name: "ODBCKit",
+	dependencies: [],
+	targets: [
+		.target(
 			name: "nanodbcCXX", cxxSettings: [
 				.define("NANODBC_DISABLE_TESTS", to: "ON"),
 				.define("NANODBC_DISABLE_EXAMPLES", to: "ON"),
@@ -16,16 +16,16 @@ let package = Package(
 					[
 						"-L", "/Users/lebje/homebrew/lib",
 						"-I", "/Users/lebje/homebrew/include/",
-						"-I", "/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a.xctoolchain/usr/include/c++/v1/",
+						"-I", "/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2021-04-15-a.xctoolchain/usr/include/c++/v1/",
 					]
-				)
+				),
 			], linkerSettings: [
-				.linkedLibrary("odbc")
+				.linkedLibrary("odbc"),
 			]
 		),
-        .target(
-            name: "ODBCKit",
-            dependencies: ["nanodbcCXX"],
+		.target(
+			name: "ODBCKit",
+			dependencies: ["nanodbcCXX"],
 			swiftSettings: [
 				.unsafeFlags(
 					[
@@ -36,19 +36,18 @@ let package = Package(
 						"-Xfrontend", "-validate-tbd-against-ir=none",
 						"-L", "/Users/lebje/homebrew/lib",
 						"-I", "/Users/lebje/homebrew/include/",
-						"-I", "/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a.xctoolchain/usr/include/c++/v1/",
+						"-I", "/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2021-04-15-a.xctoolchain/usr/include/c++/v1/",
 					]
-				)
+				),
 			]
 		),
-        .testTarget(
-            name: "ODBCKitTests",
-            dependencies: ["ODBCKit"]
+		.testTarget(
+			name: "ODBCKitTests",
+			dependencies: ["ODBCKit"]
 		),
 	],
 	cxxLanguageStandard: .cxx14
 )
-
 
 if let headerPath = ProcessInfo.processInfo.environment["CUSTOM_HEADER_PATH"] {
 	package.targets[0].cxxSettings?.append(.unsafeFlags(["-I\(headerPath)"]))

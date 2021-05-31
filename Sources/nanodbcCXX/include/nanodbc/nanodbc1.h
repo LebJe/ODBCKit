@@ -10,8 +10,9 @@
 #include <string>
 #include "../../nanodbc.h"
 
-/// Converts a \c char* into a \c std::string.
-/// @param string The \c char*  you wish to convert.
+/// Converts a \c char*  into a \c std::string.
+///
+/// @param string The \c char* you wish to convert.
 std::string stringFromCString(const char * string) {
 	return NANODBC_TEXT(string);
 }
