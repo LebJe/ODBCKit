@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -9,13 +9,15 @@
 #include <list>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 
 extern "C" {
-	const CDriver * listDrivers(unsigned long * cDriverArraySize) {
+	const CDriver * _Null_unspecified listDrivers(unsigned long * _Nonnull cDriverArraySize) {
 		auto drivers = nanodbc::list_drivers();
 
-		std::vector<nanodbc::driver> driverVector{ std::make_move_iterator(std::begin(drivers)),
-			std::make_move_iterator(std::end(drivers)) };
+		auto driverVector = std::vector<nanodbc::driver>(
+			std::make_move_iterator(std::begin(drivers)),
+			std::make_move_iterator(std::end(drivers)));
 
 		unsigned long size = driverVector.size();
 
@@ -25,9 +27,11 @@ extern "C" {
 			auto d = driverVector[i];
 			CDriver * driver = new CDriver;
 			driver->name = strdup(d.name.c_str());
-			
-			std::vector<nanodbc::driver::attribute> attrVector{ std::make_move_iterator(std::begin(d.attributes)),
-				std::make_move_iterator(std::end(d.attributes)) };
+
+			std::vector<nanodbc::driver::attribute> attrVector {
+				std::make_move_iterator(std::begin(d.attributes)),
+				std::make_move_iterator(std::end(d.attributes))
+			};
 
 			unsigned long attrSize = attrVector.size();
 
@@ -43,16 +47,19 @@ extern "C" {
 
 			driverArray[i] = *driver;
 		}
-		
+
 		*cDriverArraySize = size;
 		return driverArray;
 	}
 
-	const CDataSource * listDataSources(unsigned long * cDataSourceArraySize) {
+	const CDataSource * _Null_unspecified listDataSources(
+		unsigned long * _Nonnull cDataSourceArraySize) {
 		auto dataSources = nanodbc::list_datasources();
 
-		std::vector<nanodbc::datasource> dataSourceVector{ std::make_move_iterator(std::begin(dataSources)),
-			std::make_move_iterator(std::end(dataSources)) };
+		std::vector<nanodbc::datasource> dataSourceVector {
+			std::make_move_iterator(std::begin(dataSources)),
+			std::make_move_iterator(std::end(dataSources))
+		};
 
 		unsigned long size = dataSourceVector.size();
 

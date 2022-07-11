@@ -1,6 +1,6 @@
 //
 //  Header.h
-//  
+//
 //
 //  Created by Jeff Lebrun on 4/18/21.
 //
@@ -10,8 +10,8 @@
 
 #ifdef __cplusplus
 
-#include <string>
-#include "CNanODBC.h"
+	#include "CNanODBC.h"
+	#include <string>
 
 std::string charToString(const char * string);
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -26,17 +26,10 @@ public struct DataSource {
 	/// Retrieve a list of all datasources.
 	public static func all() -> [DataSource] {
 		var size: UInt = 0
-		var dataSourceArray: [DataSource] = []
-		let dataSources = listDataSources(&size)
 
-		if dataSources != nil {
-			for i in 0..<Int(size) {
-				dataSourceArray.append(DataSource(cDataSource: dataSources![i]))
-			}
+		guard let dataSources = listDataSources(&size) else { return [] }
 
-			return dataSourceArray
-		} else {
-			return []
-		}
+		return UnsafeBufferPointer(start: dataSources, count: Int(size))
+			.map(DataSource.init(cDataSource:))
 	}
 }

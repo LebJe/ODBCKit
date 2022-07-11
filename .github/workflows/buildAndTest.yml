@@ -2,69 +2,77 @@ name: "Build and Test"
 on: ["push", "pull_request"]
 
 jobs:
-  TestOnMacOS-11_0-x86_64:
-    runs-on: "macos-11.0"
-    steps:
-    - uses: "actions/checkout@v2"
-    - name: "Install Dependencies"
-      run: |
-        brew update
-        brew install sqlite unixodbc sqliteodbc psqlodbc
+    TestOnMacOS-Latest-x86_64:
+        runs-on: "macos-latest"
+        steps:
+            - uses: "actions/checkout@v2"
+            - name: "Install Dependencies"
+              run: |
+                  brew update
+                  brew install sqlite unixodbc sqliteodbc psqlodbc
 
-        brew info postgres
+                  brew services start postgresql
 
-        brew services start postgresql
+                  echo "Check PostgreSQL service is running"
+                  i=10
+                  COMMAND='pg_isready'
+                  while [ $i -gt 0 ]; do
+                      echo "Check PostgreSQL service status"
+                      eval $COMMAND && break
+                      ((i--))
+                      if [ $i == 0 ]; then
+                          echo "PostgreSQL service not ready, all attempts exhausted"
+                          exit 1
+                      fi
+                      echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
+                      sleep 10
+                  done
 
-        echo "Check PostgreSQL service is running"
-        i=10
-        COMMAND='pg_isready'
-        while [ $i -gt 0 ]; do
-            echo "Check PostgreSQL service status"
-            eval $COMMAND && break
-            ((i--))
-            if [ $i == 0 ]; then
-                echo "PostgreSQL service not ready, all attempts exhausted"
-                exit 1
-            fi
-            echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
-            sleep 10
-        done
+                  #psql --command="\du;" -U $(echo $USER)
 
-        #psql --command="\du;" -U $(echo $USER)
+                  #createdb --owner=postgres testdb
+                  #PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
 
-        #createdb --owner=postgres testdb
-        #PGPASSWORD=postgres psql --username=postgres --host=localhost --list testdb
+                  # Based on https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_script.sqlite.sh
+                  # and https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_install.osx.sh
 
-        # Based on https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_script.sqlite.sh
-        # and https://github.com/nanodbc/nanodbc/blob/master/utility/ci/travis/before_install.osx.sh
+                  cat $(odbc_config --odbcinstini)
 
-        cat > "$(odbc_config --odbcinstini)" <<EOF
-        [PostgreSQL]
-        Description = PostgreSQL ODBC Driver
-        Driver = $(brew ls psqlodbc -v | grep psqlodbcw.so)
-        [SQLite3]
-        Description = SQLite3 ODBC Driver
-        Driver = $(brew ls -v sqliteodbc | grep libsqlite3odbc.dylib)
-        EOF
-    - name: "Run Tests"
-      run: |
-        sudo xcode-select -s /Applications/Xcode_12.5.app
-        swift test --disable-sandbox -Xlinker "$(pkg-config --libs-only-L odbc)" -Xswiftc "-target" -Xswiftc "x86_64-apple-macosx11.3"
-  TestOnUbuntu20_04-x86_64:
-    runs-on: "ubuntu-20.04"
-    steps:
-      - uses: "actions/checkout@v2"
-      - name: "Setup Databases"
-        run: |
-          sudo apt update -q
-          sudo apt install -yq unixodbc-dev unixodbc odbc-postgresql libsqliteodbc libsqlite3-dev sqlite3
+                  SQLITE_DRIVER=$(brew ls -v sqliteodbc | grep libsqlite3odbc.dylib)
 
-          sudo systemctl start postgresql.service
-          pg_isready
+                  cat > "$(odbc_config --odbcinstini)" <<EOF
+                  [PostgreSQL]
+                  Description = PostgreSQL ODBC Driver
+                  Driver = $(brew ls psqlodbc -v | grep psqlodbcw.so)
 
-          sudo odbcinst -i -d -f /usr/share/sqliteodbc/unixodbc.ini
-          #sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
-      - name: "Run Tests"
-        run: |
-          cat /etc/odbcinst.ini
-          swift test -Xcxx -stdlib=libc++ -Xlinker -lc++abi -Xlinker -lc++
+                  [SQLite3]
+                  Description = SQLite3 ODBC Driver
+                  Driver = $SQLITE_DRIVER
+                  Setup = $SQLITE_DRIVER
+                  Threading = 2
+                  EOF
+
+                  cat $(odbc_config --odbcinstini)
+            - name: "Run Tests"
+              run: |
+                  export POSTGRES_CONNECTION_STRING="Driver={PostgreSQL};Database=postgres;UID=postgres;Server=localhost;"
+                  swift test -Xlinker "$(pkg-config --libs-only-L odbc)"
+    TestOnUbuntu20_04-x86_64:
+        runs-on: "ubuntu-20.04"
+        steps:
+            - uses: "actions/checkout@v2"
+            - name: "Setup Databases"
+              run: |
+                  sudo apt update -q
+                  sudo apt install -yq unixodbc-dev unixodbc odbc-postgresql libsqliteodbc libsqlite3-dev sqlite3
+
+                  sudo systemctl start postgresql.service
+                  pg_isready
+
+                  sudo odbcinst -i -d -f /usr/share/sqliteodbc/unixodbc.ini
+                  #sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
+            - name: "Run Tests"
+              run: |
+                  cat /etc/odbcinst.ini
+                  export POSTGRES_CONNECTION_STRING="Driver={PostgreSQL ANSI};Database=postgres;UID=postgres;Server=localhost;"
+                  swift test

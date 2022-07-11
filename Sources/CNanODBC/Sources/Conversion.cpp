@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -17,13 +17,11 @@ nanodbc::time cTimeToTime(CTime time) {
 }
 
 nanodbc::timestamp cTimeStampToTimestamp(CTimeStamp ts) {
-	return nanodbc::timestamp {
-		.year = ts.date.year,
-		.month = ts.date.month,
-		.day = ts.date.day,
-		.hour = ts.hour,
-		.min = ts.minute,
-		.sec = ts.second,
-		.fract = ts.fractionalSec
-	};
+	return nanodbc::timestamp { .year = ts.date.year,
+								.month = ts.date.month,
+								.day = ts.date.day,
+								.hour = ts.hour,
+								.min = ts.minute,
+								.sec = ts.second,
+								.fract = ts.fractionalSec };
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -6,49 +6,77 @@
 
 import CNanODBC
 
+/// The result of running a query.
 public struct Result {
-	let resPointer: OpaquePointer?
+	let resPointer: OpaquePointer
 
-	public func hasAffectedRows() throws -> Int {
-		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
-		let res = resultAffectedRows(self.resPointer, errorPointer)
+	/// The amount of affected rows.
+	/// - Throws: ``ODBCError``.
+	public var affectedRows: Int {
+		get throws {
+			let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+			let res = resultAffectedRows(self.resPointer, errorPointer)
 
-		if try self.handleError(errorPointer: errorPointer) {
-			return res
-		} else {
-			return 0
+			if errorPointer.pointee.isValid {
+				throw ODBCError.fromErrorPointer(errorPointer)
+			} else {
+				return res
+			}
 		}
 	}
 
 	/// The amount of columns in this `Result`.
-	public func columns() throws -> Int {
-		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
-		let res = resultNumCols(self.resPointer, errorPointer)
+	/// - Throws: ``ODBCError``.
+	public var columns: Int {
+		get throws {
+			let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+			let res = resultNumCols(self.resPointer, errorPointer)
 
-		if try self.handleError(errorPointer: errorPointer) {
-			return Int(res)
-		} else {
-			return 0
+			if errorPointer.pointee.isValid {
+				throw ODBCError.fromErrorPointer(errorPointer)
+			} else {
+				return Int(res)
+			}
 		}
 	}
 
-	/// The amount of rows in this `Result`.
+	/// The amount of rows in this `Result`, or 0 if the number of rows is not available.
+	/// - Throws: ``ODBCError``.
 	public var rows: Int {
-		resultNumRows(self.resPointer)
+		get throws {
+			let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+			let res = resultNumRows(self.resPointer, errorPointer)
+
+			if errorPointer.pointee.isValid {
+				throw ODBCError.fromErrorPointer(errorPointer)
+			} else {
+				return Int(res)
+			}
+		}
+	}
+
+	/// The row that is currently selected.
+	public var position: Int {
+		Int(resultPosition(self.resPointer))
+	}
+
+	/// If the last row is selected.
+	public var isAtEnd: Bool {
+		resultAtEnd(self.resPointer)
 	}
 
 	/// Advances to the next row in the `Result`.
 	/// - Throws: `ODBCError`.
 	/// - Returns: `true` if `next` successfully advanced to the next row, `false` otherwise.
 	public func next() throws -> Bool {
-		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
 
 		let res = resultNext(resPointer, errorPointer)
 
-		if try self.handleError(errorPointer: errorPointer) {
-			return res
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
 		} else {
-			return false
+			return res
 		}
 	}
 
@@ -56,50 +84,114 @@ public struct Result {
 	/// - Throws: `ODBCError`.
 	/// - Returns: `true` if `previous` successfully returned to the previous row, `false` otherwise.
 	public func previous() throws -> Bool {
-		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
 
 		let res = resultPrior(resPointer, errorPointer)
 
-		if try self.handleError(errorPointer: errorPointer) {
-			return res
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
 		} else {
-			return false
+			return res
 		}
 	}
 
-	/// `true` if we should return the value and `false` if we should return `nil`.
-	func handleError(errorPointer: UnsafeMutablePointer<CError>) throws -> Bool {
-		if errorPointer.pointee.message == nil {
-			return true
-		}
+	/// Jumps to the first row in the `Result`.
+	/// - Throws: `ODBCError`.
+	/// - Returns: `true` if successfully jumped to the first row, `false` otherwise.
+	public func first() throws -> Bool {
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
 
-		switch errorPointer.pointee.reason {
-			case ErrorReason.general:
-				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
-			case ErrorReason.nullAccessError:
-				return false
-			case ErrorReason.invalidType:
-				throw ODBCError.invalidType
-			case ErrorReason.indexOutOfRange:
-				throw ODBCError.indexOutOfRange
-			case ErrorReason.programmingError:
-				throw ODBCError.programmingError(message: String(cString: errorPointer.pointee.message))
-			case ErrorReason.databaseError:
-				throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
-			default:
-				throw ODBCError.general(message: String(cString: errorPointer.pointee.message))
+		let res = resultFirst(resPointer, errorPointer)
+
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
+		} else {
+			return res
 		}
 	}
 
-	subscript(index: Int) -> ResultValue? {
+	/// Jumps to the last row in the `Result`.
+	/// - Throws: `ODBCError`.
+	/// - Returns: `true` if successfully jumped to the last row, `false` otherwise.
+	public func last() throws -> Bool {
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+
+		let res = resultLast(resPointer, errorPointer)
+
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
+		} else {
+			return res
+		}
+	}
+
+	/// Moves to the specified row in the `Result`.
+	/// - Throws: `ODBCError`.
+	/// - Returns: `true` if successfully jumped to the specified row, `false` otherwise.
+	public func move(to row: Int) throws -> Bool {
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+
+		let res = resultMoveTo(resPointer, row, errorPointer)
+
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
+		} else {
+			return res
+		}
+	}
+
+	/// Skips the specified amount of rows in the `Result`.
+	/// - Throws: `ODBCError`.
+	/// - Returns: `true` if successfully skipped specified rows, `false` otherwise.
+	public func skip(rows: Int) throws -> Bool {
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+
+		let res = resultSkip(resPointer, rows, errorPointer)
+
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
+		} else {
+			return res
+		}
+	}
+
+	/// Finds the index of the named column in the currently selected row.
+	public func index(of column: String) throws -> Int {
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+		let res = resultColumnIndex(self.resPointer, column, errorPointer)
+
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
+		} else {
+			return Int(res)
+		}
+	}
+
+	/// Finds the name of the indexed column in the currently selected row.
+	public func name(of index: Int) throws -> String {
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+		let res = resultColumnName(self.resPointer, Int16(index), errorPointer)
+
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
+		} else {
+			guard let s = res?.string else {
+				throw ODBCError.unexpectedNull(name: "nanodbc::result::column_name")
+			}
+
+			return s
+		}
+	}
+
+	public subscript(index: Int) -> Self.Value? {
 		mutating get {
-			ResultValue(numOrName: .left(Int16(index)), resPointer: self.resPointer!)
+			Self.Value(numOrName: .left(Int16(index)), resPointer: self.resPointer)
 		}
 	}
 
-	subscript(name: String) -> ResultValue? {
+	public subscript(name: String) -> Self.Value? {
 		mutating get {
-			ResultValue(numOrName: .right(name), resPointer: self.resPointer!)
+			Self.Value(numOrName: .right(name), resPointer: self.resPointer)
 		}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -52,17 +52,10 @@ public struct Driver {
 	/// Retrieve a list of all the installed `Driver`s.
 	public static func all() -> [Driver] {
 		var size: UInt = 0
-		var driverArray: [Driver] = []
-		let drivers = listDrivers(&size)
 
-		if drivers != nil {
-			for i in 0..<Int(size) {
-				driverArray.append(Driver(cDriver: drivers![i]))
-			}
+		guard let drivers = listDrivers(&size) else { return [] }
 
-			return driverArray
-		} else {
-			return []
-		}
+		return UnsafeBufferPointer(start: drivers, count: Int(size))
+			.map(Driver.init(cDriver:))
 	}
 }

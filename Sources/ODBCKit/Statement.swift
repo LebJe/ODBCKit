@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -7,36 +7,45 @@
 import CNanODBC
 
 public class Statement {
+	enum BindDirection: Int {
+		case `in`
+		case out
+	}
+
 	let statementPointer: OpaquePointer
 
 	public init(connection: Connection, query: String, timeout: Int = 0) {
 		self.statementPointer = stmtCreate(connection.connection, query, timeout)
 	}
 
+	/// Binds `value` to the `?` parameter at `index`.
+	///
+	/// `?` parameters start from 0.
+	///
+	/// - Throws: ``ODBCError``
+	public func bind<B: BindableValue>(_ value: B, to index: Int) throws {
+		try value.bind(stmtPointer: self.statementPointer, index: Int16(index))
+	}
+
 	/// Executes this `Statement` and returns the `Result` of execution.
-	/// - Parameter values: The values to bind to the parameters in your query.
+	/// - Parameter values: The values to bind to the `?` parameters in your query.
 	/// - Throws: `ODBCError`.
 	/// - Returns: `Result`.
-	public func execute(with values: [BindableValue?] = []) throws -> Result {
+	public func execute<B: BindableValue>(with values: [B?] = [], timeout: Int = 0) throws -> Result {
 		for i in 0..<values.count {
-			if values[i] == nil {
-				stmtBindNull(self.statementPointer, Int16(i))
-			} else {
-				try values[i]!.bind(stmtPointer: self.statementPointer, index: Int16(i))
-			}
+			try values[i].bind(stmtPointer: self.statementPointer, index: Int16(i))
 		}
 
-		let errorPointer = UnsafeMutablePointer<CError>.allocate(capacity: 1)
-		let resPointer = stmtExecute(statementPointer, errorPointer)
+		let errorPointer = UnsafeMutablePointer<CError>.cErrorPointer
+		let resPointer = stmtExecute(statementPointer, timeout, errorPointer)
 
-		if errorPointer.pointee.message != nil {
-			switch errorPointer.pointee.reason {
-				case ErrorReason.databaseError: throw ODBCError.databaseError(message: String(cString: errorPointer.pointee.message))
-				default: throw ODBCError.general(message: errorPointer.pointee.message != nil ? String(cString: errorPointer.pointee.message) : nil)
-			}
+		if errorPointer.pointee.isValid {
+			throw ODBCError.fromErrorPointer(errorPointer)
 		}
 
-		return Result(resPointer: resPointer)
+		guard let res = resPointer else { throw ODBCError.unexpectedNull(name: "nanodbc::statement::execute") }
+
+		return Result(resPointer: res)
 	}
 
 //	deinit {

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -9,13 +9,16 @@
 
 #ifdef __cplusplus
 
-#include <string>
+	#include <string>
 
 extern "C" {
 #endif
 
-	#include <stdbool.h>
-	#include <stdint.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+	// For `SQL_C_*` types.
+	//#include <sqlext.h>
 
 	// MARK: - Structs
 
@@ -28,41 +31,66 @@ extern "C" {
 	struct CStatement;
 	typedef struct CStatement CStatement;
 
+	struct CCatalog;
+	typedef struct CCatalog CCatalog;
+
+	struct CTables;
+	typedef struct CTables CTables;
+
+	struct CTablePrivileges;
+	typedef struct CTablePrivileges CTablePrivileges;
+
+	struct CColumns;
+	typedef struct CColumns CColumns;
+
+	struct CPrimaryKeys;
+	typedef struct CPrimaryKeys CPrimaryKeys;
+
+	struct CProcedures;
+	typedef struct CProcedures CProcedures;
+
+	struct CProcedureColumns;
+	typedef struct CProcedureColumns CProcedureColumns;
+
+	struct CProcedureColumns;
+	typedef struct CProcedureColumns CProcedureColumns;
+
 	struct CDataSource {
-		const char * name;
-		const char * driver;
+		const char * _Nonnull name;
+		const char * _Nonnull driver;
 	};
 
 	typedef struct CDataSource CDataSource;
 
 	struct CAttribute {
-		const char * keyword;
-		const char * value;
+		const char * _Nonnull keyword;
+		const char * _Nonnull value;
 	};
 
 	typedef struct CAttribute CAttribute;
 
 	struct CDriver {
-		const char * name;
-		const unsigned long * attrSize;
-		const CAttribute * attributes;
+		const char * _Nonnull name;
+		const unsigned long * _Nonnull attrSize;
+		const CAttribute * _Nullable attributes;
 	};
 
 	typedef struct CDriver CDriver;
 
-enum ErrorReason {
-	general,
-	nullAccessError,
-	invalidType,
-	indexOutOfRange,
-	programmingError,
-	databaseError
-} __attribute__((enum_extensibility(open)));
+	enum ErrorReason {
+		general,
+		nullAccessError,
+		invalidType,
+		indexOutOfRange,
+		programmingError,
+		databaseError
+	} __attribute__((enum_extensibility(open)));
 
-typedef enum ErrorReason ErrorReason;
+	typedef enum ErrorReason ErrorReason;
 
 	struct CError {
-		char * message;
+		bool isValid;
+		char * _Nullable message;
 		ErrorReason reason;
 	};
 
@@ -95,58 +123,158 @@ typedef enum ErrorReason ErrorReason;
 	typedef struct CTimeStamp CTimeStamp;
 
 	// MARK: - Connection
-	CConnection * createConnectionConnectionString(const char * connStr, long timeout, CError * error);
-	CConnection * createConnectionDSN(const char * dsn, const char * username, const char * password, long timeout, CError * error);
-	void destroyConnection(CConnection * conn);
+	CConnection * _Nullable createConnectionConnectionString(
+		const char * _Nonnull connStr, long timeout, CError * _Nonnull error);
+	CConnection * _Nullable createConnectionDSN(
+		const char * _Nonnull dsn, const char * _Nonnull username, const char * _Nonnull password,
+		long timeout, CError * _Nonnull error);
+	bool connectionConnected(CConnection * _Nonnull conn);
+	const char * _Nonnull connectionDBMSName(CConnection * _Nonnull conn);
+	const char * _Nonnull connectionDBMSVersion(CConnection * _Nonnull conn);
+	const char * _Nonnull connectionDatabaseName(CConnection * _Nonnull conn);
+	CError * _Nullable connectionDisconnect(CConnection * _Nonnull conn);
+	void destroyConnection(CConnection * _Nonnull conn);
 
 	// MARK: - List
-	const CDriver * listDrivers(unsigned long * cDriverArraySize);
-	const CDataSource * listDataSources(unsigned long * cDataSourceArraySize);
+	const CDriver * _Null_unspecified listDrivers(unsigned long * _Nonnull cDriverArraySize);
+	const CDataSource * _Null_unspecified listDataSources(
+		unsigned long * _Nonnull cDataSourceArraySize);
 
 	// MARK: - Execute
-	void justExecute(CConnection * rawConn, const char * query, long batchOperations, long timeout, CError * error);
-	CResult * cExecute(CConnection * rawConn, const char * query, long batchOperations, long timeout, CError * error);
+	void justExecute(
+		CConnection * _Nonnull rawConn, const char * _Nonnull query, long batchOperations,
+		long timeout, CError * _Nonnull error);
+	CResult * _Nullable cExecute(
+		CConnection * _Nonnull rawConn, const char * _Nonnull query, long batchOperations,
+		long timeout, CError * _Nonnull error);
 
 	// MARK: - Result
-	long resultNumRows(CResult * rawRes);
-	short resultNumCols(CResult * rawRes, CError * error);
-	long resultAffectedRows(CResult * rawRes, CError * error);
-	bool resultNext(CResult * rawRes, CError * error);
-	bool resultPrior(CResult * rawRes, CError * error);
-	short resultGetShort(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	unsigned short resultGetUnsignedShort(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	int resultGetInt(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	int64_t resultGetBigInt(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	int32_t resultGetLong(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	float resultGetFloat(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	double resultGetDouble(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	const char * resultGetString(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	CTime * resultGetTime(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	CTimeStamp * resultGetTimeStamp(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	CDate * resultGetDate(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	bool resultGetBool(CResult * rawRes, const short * colNum, const char * colName, CError * error);
-	uint8_t * resultGetBinary(CResult * rawRes, const short * colNum, const char * colName, unsigned long * sizePointer, CError * error);
+	long resultNumRows(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	short resultNumCols(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	long resultAffectedRows(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	bool resultNext(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	bool resultPrior(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	bool resultFirst(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	bool resultLast(CResult * _Nonnull rawRes, CError * _Nonnull error);
+	bool resultMoveTo(CResult * _Nonnull rawRes, long row, CError * _Nonnull error);
+	bool resultSkip(CResult * _Nonnull rawRes, long rows, CError * _Nonnull error);
+	unsigned long resultPosition(CResult * _Nonnull rawRes);
+	bool resultAtEnd(CResult * _Nonnull rawRes);
+	const char * _Nonnull resultDataTypeName(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	int resultDataType(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	bool resultIsNull(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	long resultColumnSize(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	const char * _Nullable resultColumnName(
+		CResult * _Nonnull rawRes, short colNum, CError * _Nonnull error);
+	short resultColumnIndex(
+		CResult * _Nonnull rawRes, const char * _Nonnull colName, CError * _Nonnull error);
+	short resultGetShort(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	unsigned short resultGetUnsignedShort(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	int resultGetInt(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	int64_t resultGetBigInt(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	int32_t resultGetLong(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	float resultGetFloat(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	double resultGetDouble(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	const char * _Nullable resultGetString(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	CTime * _Nullable resultGetTime(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	CTimeStamp * _Nullable resultGetTimeStamp(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	CDate * _Nullable resultGetDate(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	bool resultGetBool(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		CError * _Nonnull error);
+	uint8_t * _Nullable resultGetBinary(
+		CResult * _Nonnull rawRes, const short * _Nullable colNum, const char * _Nullable colName,
+		unsigned long * _Nonnull sizePointer, CError * _Nonnull error);
 
 	// MARK: - Statement
 
-	CStatement * stmtCreate(CConnection * rawConn, const char * query, long timeout);
-	CError * stmtBindNull(CStatement * rawStmt, short paramIndex);
-	CError * stmtBindShort(CStatement * rawStmt, short paramIndex, short value);
-	CError * stmtBindUnsignedShort(CStatement * rawStmt, short paramIndex, unsigned short value);
-	CError * stmtBindInt(CStatement * rawStmt, short paramIndex, int value);
-	CError * stmtBindBigInt(CStatement * rawStmt, short paramIndex, int64_t value);
-	CError * stmtBindLong(CStatement * rawStmt, short paramIndex, int32_t value);
-	CError * stmtBindFloat(CStatement * rawStmt, short paramIndex, float value);
-	CError * stmtBindDouble(CStatement * rawStmt, short paramIndex, double value);
-	CError * stmtBindString(CStatement * rawStmt, short paramIndex, const char * value);
-	CError * stmtBindBool(CStatement * rawStmt, short paramIndex, bool value);
-	CError * stmtBindBinary(CStatement * rawStmt, short paramIndex, uint8_t * value, int64_t size);
-	CError * stmtBindTime(CStatement * rawStmt, short paramIndex, CTime value);
-	CError * stmtBindTimeStamp(CStatement * rawStmt, short paramIndex, CTimeStamp value);
-	CError * stmtBindDate(CStatement * rawStmt, short paramIndex, CDate value);
-	CResult * stmtExecute(CStatement * rawStmt, CError * error);
-	void stmtClose(CStatement * rawStmt);
+	CStatement * _Nonnull stmtCreate(
+		CConnection * _Nonnull rawConn, const char * _Nonnull query, long timeout);
+	CError * _Nullable stmtBindNull(CStatement * _Nonnull rawStmt, short paramIndex);
+	CError * _Nullable stmtBindShort(CStatement * _Nonnull rawStmt, short paramIndex, short value);
+	CError * _Nullable stmtBindUnsignedShort(
+		CStatement * _Nonnull rawStmt, short paramIndex, unsigned short value);
+	CError * _Nullable stmtBindInt(CStatement * _Nonnull rawStmt, short paramIndex, int value);
+	CError * _Nullable stmtBindBigInt(
+		CStatement * _Nonnull rawStmt, short paramIndex, int64_t value);
+	CError * _Nullable stmtBindLong(CStatement * _Nonnull rawStmt, short paramIndex, int32_t value);
+	CError * _Nullable stmtBindFloat(CStatement * _Nonnull rawStmt, short paramIndex, float value);
+	CError * _Nullable stmtBindDouble(
+		CStatement * _Nonnull rawStmt, short paramIndex, double value);
+	CError * _Nullable stmtBindString(
+		CStatement * _Nonnull rawStmt, short paramIndex, const char * _Nonnull value);
+	CError * _Nullable stmtBindBool(CStatement * _Nonnull rawStmt, short paramIndex, bool value);
+	CError * _Nullable stmtBindBinary(
+		CStatement * _Nonnull rawStmt, short paramIndex, const uint8_t * _Nonnull value,
+		int64_t size);
+	CError * _Nullable stmtBindTime(CStatement * _Nonnull rawStmt, short paramIndex, CTime value);
+	CError * _Nullable stmtBindTimeStamp(
+		CStatement * _Nonnull rawStmt, short paramIndex, CTimeStamp value);
+	CError * _Nullable stmtBindDate(CStatement * _Nonnull rawStmt, short paramIndex, CDate value);
+	CResult * _Nullable stmtExecute(
+		CStatement * _Nonnull rawStmt, long timeout, CError * _Nonnull error);
+	void stmtClose(CStatement * _Nonnull rawStmt);
 
+	// MARK - Catalog
+
+	CCatalog * _Nonnull catalogCreate(CConnection * _Nonnull conn);
+	char * _Nonnull * _Nullable catalogListCatalogs(
+		CCatalog * _Nonnull catalog, unsigned long * _Nonnull arraySize, CError * _Nonnull error);
+	char * _Nonnull * _Nullable catalogListSchemas(
+		CCatalog * _Nonnull catalog, unsigned long * _Nonnull arraySize, CError * _Nonnull error);
+	CColumns * _Nullable catalogFindColumns(
+		CCatalog * _Nonnull catalogPointer, const char * _Nonnull column,
+		const char * _Nonnull table, const char * _Nonnull schema, const char * _Nonnull catalog);
+
+	// MARK: - Catalog - Columns
+	long catalogColumnBufferLength(CColumns * _Nonnull columns);
+	long catalogColumnCharOctetLength(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnDefault(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnName(CColumns * _Nonnull columns);
+	long catalogColumnSize(CColumns * _Nonnull columns);
+	short catalogColumnDataType(CColumns * _Nonnull columns);
+	short catalogColumnDecimalDigits(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogIsNullable(CColumns * _Nonnull columns);
+	bool catalogColumnNext(CColumns * _Nonnull columns);
+	short catalogColumnNumericPrecisionRadix(CColumns * _Nonnull columns);
+	long catalogColumnOrdinalPosition(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnRemarks(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnTableCatalog(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnTableName(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnTableSchema(CColumns * _Nonnull columns);
+	const char * _Nonnull catalogColumnTypeName(CColumns * _Nonnull columns);
+	short catalogColumnSQLDataType(CColumns * _Nonnull columns);
+	short catalogColumnSQLDateTimeSubType(CColumns * _Nonnull columns);
 #ifdef __cplusplus
 }
 #endif

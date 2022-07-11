@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Jeff Lebrun
+// Copyright (c) 2022 Jeff Lebrun
 //
 //  Licensed under the MIT License.
 //
@@ -10,7 +10,6 @@ import XCTest
 final class PostgreSQLTests: XCTestCase {
 	static var createTableStmt = """
 	DROP TABLE IF EXISTS "public"."dataTypes";
-	-- This script only contains the table creation statements and does not fully represent the table in the database. It's still missing: indices, triggers. Do not use it as a backup.
 
 	-- Sequence and defined type
 	CREATE SEQUENCE IF NOT EXISTS "dataTypes_id_seq";
@@ -32,18 +31,25 @@ final class PostgreSQLTests: XCTestCase {
 
 	INSERT INTO "public"."dataTypes" ("id", "string", "int", "float", "bool", "date", "time", "timestamp", "binary", null_field) VALUES
 	(1, 'string 1', 23809, 34023.329, 't', '2021-05-27', '07:52:13.600253', '2021-05-27 12:09:58.14121', '\\x48656c6c6f20576f726c640a', NULL);
-
 	"""
 
-	#if os(macOS)
-		static var connString = ConnectionType.odbcString("Driver={PostgreSQL};Database=postgres;UID=postgres;Server=localhost;")
-	#elseif os(Linux)
-		static var connString = ConnectionType.odbcString("Driver={PostgreSQL ANSI};Database=postgres;UID=postgres;Server=localhost;")
-	#endif
+	static var connString = ConnectionType
+		.odbcString(
+			ProcessInfo.processInfo
+				.environment["POSTGRES_CONNECTION_STRING"] ?? "POSTGRES_CONNECTION_STRING not found"
+		)
 
 	override class func setUp() {
 		do {
 			let conn = try Connection(Self.connString)
+
+			let catalog = Catalog(connection: conn)
+
+			print("DBMS Name: \(conn.dbmsName)")
+			print("DBMS Version: \(conn.dbmsVersion)")
+			print("Database Name: \(conn.databaseName)")
+			print("Catalogs: \(try catalog.catalogs)")
+			print("Schemas: \(try catalog.schemas)")
 
 			try conn.justExecute(query: Self.createTableStmt)
 		} catch {
@@ -58,13 +64,9 @@ final class PostgreSQLTests: XCTestCase {
 
 		XCTAssertTrue(try res.next(), "ERROR: Unable to advance to next row!")
 
-		XCTAssertEqual(try res[0]!.int()!, 1)
-		XCTAssertEqual(try res[1]!.string()!, "string 1")
-		XCTAssertEqual(try res[2]!.int()!, 23809)
-		XCTAssertNil(try res[9]?.string())
+		XCTAssertEqual(try res[0]!.int, 1)
+		XCTAssertEqual(try res[1]!.string, "string 1")
+		XCTAssertEqual(try res[2]!.int, 23809)
+		XCTAssertNil(try res[9]?.string)
 	}
-
-	static var allTests = [
-		("Test Retrieving Values", testRetrieveValues),
-	]
 }
